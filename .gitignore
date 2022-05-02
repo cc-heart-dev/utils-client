@@ -1,0 +1,11 @@
+/node_modules/
+
+*.lock
+
+.vscode
+
+src/demo/node/config/
+
+.zip
+
+.package-lock.json
