@@ -6,7 +6,7 @@
   "author": "heart",
   "license": "MIT",
   "scripts": {
-    "dev": "tsc -p ./tsconfig.json --watch",
+    "dev:tsc": "tsc -p ./tsconfig.json --watch",
     "test": "jest",
     "test:dev": "jest --watch",
     "start": "webpack-dev-server --config development.config.js",
