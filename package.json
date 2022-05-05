@@ -46,6 +46,7 @@
   },
   "dependencies": {
     "husky": "^7.0.4",
+    "jest-environment-jsdom": "^28.0.2",
     "lint-staged": "^12.4.1",
     "stylelint": "^14.8.2",
     "stylelint-config-prettier": "^9.0.3",
