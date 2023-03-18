@@ -25,6 +25,7 @@
     "noFallthroughCasesInSwitch": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
+    "noEmit": true
   },
   "exclude": [
     "__test__/**/*",
