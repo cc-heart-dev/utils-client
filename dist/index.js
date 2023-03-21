@@ -1,3 +1,5 @@
+import consola from 'consola/dist/consola';
+
 /**
  * @description Append according to the initial time
  * @param { Date } date
@@ -264,4 +266,6 @@ class Request {
     }
 }
 
-export { Request, addClassName, addStyles, copy, dateAddMonth, dateAddTime, dateDivideMonth, dateDivideTime, getStyles, removeClassName, removeStyles };
+const logger = consola;
+
+export { Request, addClassName, addStyles, copy, dateAddMonth, dateAddTime, dateDivideMonth, dateDivideTime, getStyles, logger, removeClassName, removeStyles };
