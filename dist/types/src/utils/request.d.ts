@@ -4,7 +4,7 @@ interface IInterceptor {
     responseInterceptor?: func;
     errorInterceptor?: func;
 }
-export type params = Record<string, any>;
+export type params = Record<string, any> | FormData;
 export type requestInit = Omit<RequestInit, "body">;
 export declare function _Get<Response, U extends params = params>(url: string, params?: U, requestInit?: requestInit, interceptor?: IInterceptor): Promise<Response>;
 export declare function _Post<Response, U extends params = params>(url: string, params?: U, requestInit?: requestInit, interceptor?: IInterceptor): Promise<Response>;

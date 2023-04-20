@@ -12,7 +12,7 @@ export declare class Request<Response> {
         errorInterceptor: func;
     };
     constructor(baseUrl: string);
-    request<Res = Response, U extends params = params>(url: string, cb: cb, params?: U, requestInit?: requestInit): Promise<Res>;
+    request<Res = Response, U extends params | FormData = params>(url: string, cb: cb, params?: U, requestInit?: requestInit): Promise<Res>;
     Get<Res = Response, U extends params = params>(url: string, params?: U, requestInit?: requestInit): Promise<Res>;
     Post: <Res = Response, U extends params = params>(url: string, params?: U, requestInit?: requestInit) => Promise<Res>;
     Put: <Res = Response, U extends params = params>(url: string, params?: U, requestInit?: requestInit) => Promise<Res>;

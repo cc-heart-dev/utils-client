@@ -15,7 +15,7 @@ interface IInterceptor {
   errorInterceptor?: func;
 }
 
-export type params = Record<string, any>;
+export type params = Record<string, any> | FormData;
 export type requestInit = Omit<RequestInit, "body">;
 type ContentType =
   | "application/x-www-form-urlencoded"
@@ -126,7 +126,14 @@ export function _Post<Response, U extends params = params>(
   requestInit: requestInit = {},
   interceptor?: IInterceptor
 ): Promise<Response> {
-  const body = getBody(params || {});
+  let body: string | FormData
+  if (params instanceof FormData) {
+    body = body
+  }
+  else {
+    body = getBody(params || {});
+  }
+
   return requestMethod(
     url,
     requestType.POST,
@@ -141,7 +148,13 @@ export function _Put<Response, U extends params = params>(
   requestInit: requestInit = {},
   interceptor?: IInterceptor
 ): Promise<Response> {
-  const body = getBody(params || {});
+  let body: string | FormData
+  if (params instanceof FormData) {
+    body = body
+  }
+  else {
+    body = getBody(params || {});
+  }
   return requestMethod(
     url,
     requestType.PUT,
@@ -156,23 +169,6 @@ export function _Delete<Response, U extends params = params>(
   requestInit: requestInit = {},
   interceptor?: IInterceptor
 ): Promise<Response> {
-  const fullPath = getFullPath(params || {}, url);
+  const fullPath = getFullPath(params as Record<string, any> || {}, url);
   return requestMethod(fullPath, requestType.DELETE, requestInit, interceptor);
 }
-
-// export function FormDataPost<T>(
-//   url: string,
-//   params?: params,
-//   requestInit: requestInit = {}
-// ): Promise<BaseResponse<T>> {
-//   // formData形式
-//   return postRequest(url, requestInit, "application/x-www-form-urlencoded");
-// }
-// export function MultiPost<T>(
-//   url: string,
-//   params?: params,
-//   requestInit: requestInit = {}
-// ): Promise<BaseResponse<T>> {
-//   // new FormData形式
-//   return postRequest(url, requestInit, "multipart/form-data");
-// }

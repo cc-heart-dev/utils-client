@@ -190,33 +190,29 @@ function _Get(url, params, requestInit = {}, interceptor) {
     return requestMethod(fullPath, requestType.GET, requestInit, interceptor);
 }
 function _Post(url, params, requestInit = {}, interceptor) {
-    const body = getBody(params || {});
+    let body;
+    if (params instanceof FormData) {
+        body = body;
+    }
+    else {
+        body = getBody(params || {});
+    }
     return requestMethod(url, requestType.POST, { ...requestInit, body }, interceptor);
 }
 function _Put(url, params, requestInit = {}, interceptor) {
-    const body = getBody(params || {});
+    let body;
+    if (params instanceof FormData) {
+        body = body;
+    }
+    else {
+        body = getBody(params || {});
+    }
     return requestMethod(url, requestType.PUT, { ...requestInit, body }, interceptor);
 }
 function _Delete(url, params, requestInit = {}, interceptor) {
     const fullPath = getFullPath(params || {}, url);
     return requestMethod(fullPath, requestType.DELETE, requestInit, interceptor);
 }
-// export function FormDataPost<T>(
-//   url: string,
-//   params?: params,
-//   requestInit: requestInit = {}
-// ): Promise<BaseResponse<T>> {
-//   // formData形式
-//   return postRequest(url, requestInit, "application/x-www-form-urlencoded");
-// }
-// export function MultiPost<T>(
-//   url: string,
-//   params?: params,
-//   requestInit: requestInit = {}
-// ): Promise<BaseResponse<T>> {
-//   // new FormData形式
-//   return postRequest(url, requestInit, "multipart/form-data");
-// }
 
 class Request {
     baseUrl;

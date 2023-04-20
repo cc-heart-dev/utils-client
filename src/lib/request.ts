@@ -26,9 +26,9 @@ export class Request<Response> {
     };
   }
 
-  constructor(private readonly baseUrl: string) {}
+  constructor(private readonly baseUrl: string) { }
 
-  request<Res = Response, U extends params = params>(
+  request<Res = Response, U extends params | FormData = params>(
     url: string,
     cb: cb,
     params?: U,
@@ -46,7 +46,7 @@ export class Request<Response> {
     return this.request(url, _Get, params, requestInit);
   }
 
-  Post = <Res = Response, U extends params = params>(
+  Post = <Res = Response, U extends params | FormData = params>(
     url: string,
     params?: U,
     requestInit?: requestInit
