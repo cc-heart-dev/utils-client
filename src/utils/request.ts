@@ -128,7 +128,7 @@ export function _Post<Response, U extends params = params>(
 ): Promise<Response> {
   let body: string | FormData
   if (params instanceof FormData) {
-    body = body
+    body = params
   }
   else {
     body = getBody(params || {});
@@ -150,7 +150,7 @@ export function _Put<Response, U extends params = params>(
 ): Promise<Response> {
   let body: string | FormData
   if (params instanceof FormData) {
-    body = body
+    body = params
   }
   else {
     body = getBody(params || {});
