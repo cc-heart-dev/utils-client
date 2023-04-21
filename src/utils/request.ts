@@ -97,7 +97,7 @@ function requestMethod<T>(
   if (!headers) {
     headers = {};
   }
-  if (!headers["Content-type"]) {
+  if (!headers["Content-type"] && !(requestInit.body instanceof FormData)) {
     headers["Content-type"] = ContentType || "application/json";
   }
 
