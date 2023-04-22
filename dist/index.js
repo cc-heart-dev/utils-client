@@ -178,7 +178,7 @@ function requestMethod(url, method, requestInit, interceptor, ContentType) {
     if (!headers) {
         headers = {};
     }
-    if (!headers["Content-type"]) {
+    if (!headers["Content-type"] && !(requestInit.body instanceof FormData)) {
         headers["Content-type"] = ContentType || "application/json";
     }
     return request(url, Object.assign({}, requestInit, { headers, method }), interceptor);
@@ -192,7 +192,7 @@ function _Get(url, params, requestInit = {}, interceptor) {
 function _Post(url, params, requestInit = {}, interceptor) {
     let body;
     if (params instanceof FormData) {
-        body = body;
+        body = params;
     }
     else {
         body = getBody(params || {});
@@ -202,7 +202,7 @@ function _Post(url, params, requestInit = {}, interceptor) {
 function _Put(url, params, requestInit = {}, interceptor) {
     let body;
     if (params instanceof FormData) {
-        body = body;
+        body = params;
     }
     else {
         body = getBody(params || {});
