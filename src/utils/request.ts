@@ -97,8 +97,8 @@ function requestMethod<T>(
   if (!headers) {
     headers = {};
   }
-  if (!headers["Content-type"] && !(requestInit.body instanceof FormData)) {
-    headers["Content-type"] = ContentType || "application/json";
+  if (Reflect.get(headers, 'Content-type') && !(requestInit.body instanceof FormData)) {
+    Reflect.set(headers, 'Content-type', ContentType || "application/json")
   }
 
   return request(

@@ -68,11 +68,11 @@ function addStyles(el, styles) {
  **/
 function removeStyles(el, styles) {
     if (typeof styles === "string") {
-        el.style[styles] = "";
+        Reflect.set(el.style, styles, '');
     }
     else {
         styles.forEach((key) => {
-            el.style[key] = "";
+            Reflect.set(el.style, key, '');
         });
     }
 }
@@ -88,7 +88,7 @@ function getStyles(el, styles) {
     if (styles === 'float') {
         styles = 'cssFloat';
     }
-    return el.style[styles];
+    return Reflect.get(el.style, styles);
 }
 
 function copy(text) {
@@ -178,8 +178,8 @@ function requestMethod(url, method, requestInit, interceptor, ContentType) {
     if (!headers) {
         headers = {};
     }
-    if (!headers["Content-type"] && !(requestInit.body instanceof FormData)) {
-        headers["Content-type"] = ContentType || "application/json";
+    if (Reflect.get(headers, 'Content-type') && !(requestInit.body instanceof FormData)) {
+        Reflect.set(headers, 'Content-type', ContentType || "application/json");
     }
     return request(url, Object.assign({}, requestInit, { headers, method }), interceptor);
 }
@@ -214,11 +214,12 @@ function _Delete(url, params, requestInit = {}, interceptor) {
     return requestMethod(fullPath, requestType.DELETE, requestInit, interceptor);
 }
 
+const noop = () => { };
 class Request {
     baseUrl;
-    requestInterceptor;
-    responseInterceptor;
-    errorInterceptor;
+    requestInterceptor = noop;
+    responseInterceptor = noop;
+    errorInterceptor = noop;
     get interceptor() {
         return {
             requestInterceptor: this.requestInterceptor,
@@ -262,6 +263,7 @@ class Request {
     }
 }
 
+// @ts-ignore
 const logger = consola;
 
 export { Request, addClassName, addStyles, copy, dateAddMonth, dateAddTime, dateDivideMonth, dateDivideTime, getStyles, logger, removeClassName, removeStyles };

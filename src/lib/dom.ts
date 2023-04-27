@@ -27,6 +27,7 @@ export function addStyles(el: HTMLElement, styles: Record<string, unknown>) {
   Object.assign(el.style, styles);
 }
 
+
 /**
  * @description remove element style attribute
  * @param { Element } el
@@ -34,10 +35,10 @@ export function addStyles(el: HTMLElement, styles: Record<string, unknown>) {
  **/
 export function removeStyles(el: HTMLElement, styles: string | string[]): void {
   if (typeof styles === "string") {
-    el.style[styles] = "";
+    Reflect.set(el.style, styles, '')
   } else {
     styles.forEach((key) => {
-      el.style[key] = "";
+      Reflect.set(el.style, key, '')
     });
   }
 }
@@ -53,5 +54,5 @@ export function getStyles(el: HTMLElement, styles: string): string | null {
   if (styles === 'float') {
     styles = 'cssFloat'
   }
-  return el.style[styles]
+  return Reflect.get(el.style, styles)
 }

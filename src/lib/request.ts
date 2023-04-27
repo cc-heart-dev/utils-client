@@ -11,12 +11,11 @@ import { isHasHttpPrefix } from "../utils/shard.js";
 type func = (...args: any[]) => void;
 
 type cb = typeof _Delete | typeof _Get | typeof _Post | typeof _Put;
-
+const noop = () => { }
 export class Request<Response> {
-  private requestInterceptor: func;
-  private responseInterceptor: func;
-
-  private errorInterceptor: func;
+  private requestInterceptor: func = noop;
+  private responseInterceptor: func = noop;
+  private errorInterceptor: func = noop;
 
   get interceptor() {
     return {
