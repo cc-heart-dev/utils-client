@@ -1,5 +1,3 @@
-import consola from 'consola/dist/consola.browser.js';
-
 /**
  * @description Append according to the initial time
  * @param { Date } date
@@ -125,7 +123,7 @@ var requestType;
 function isSpecifyResponseType(contentType, reg) {
     return reg.test(contentType);
 }
-function getFullPath(params, url) {
+function getFullPath(url, params) {
     let enCodeParams = objectToParams(params);
     enCodeParams = enCodeParams.trim() !== "" ? `?${enCodeParams}` : "";
     const fullPath = url + enCodeParams;
@@ -143,6 +141,16 @@ function getBody(params) {
         return body;
     }
 }
+function getRequestBody(params) {
+    let body;
+    if (params instanceof FormData) {
+        body = params;
+    }
+    else {
+        body = getBody(params || {});
+    }
+    return body;
+}
 // TODO: Blob ArrayBuffer formData 的判断
 // function isResponseText(contentType: string): boolean {
 //   return isSpecifyResponseType(contentType, /text\/html/)
@@ -154,7 +162,11 @@ function isResponseJson(contentType) {
 async function request(url = "", data = { method: "GET" }, interceptor = {}) {
     // request interceptor
     const { requestInterceptor, responseInterceptor, errorInterceptor } = interceptor;
-    requestInterceptor instanceof Function && requestInterceptor(data);
+    requestInterceptor &&
+        requestInterceptor.reduce((value, fn) => {
+            fn(value);
+            return value;
+        }, data);
     return fetch(url, data)
         .then((response) => {
         const ContentType = response.headers.get("content-type") || "";
@@ -165,12 +177,19 @@ async function request(url = "", data = { method: "GET" }, interceptor = {}) {
     })
         .then((res) => {
         // response interceptor
-        return Promise.resolve(responseInterceptor instanceof Function
-            ? responseInterceptor(res)
+        return Promise.resolve(Array.isArray(responseInterceptor)
+            ? responseInterceptor.reduce((res, fn) => {
+                fn(res);
+                return res;
+            }, res)
             : res);
     })
         .catch((error) => {
-        return Promise.reject(errorInterceptor instanceof Function ? errorInterceptor(error) : error);
+        return Promise.reject(Array.isArray(errorInterceptor) &&
+            errorInterceptor.reduce((error, fn) => {
+                fn(error);
+                return error;
+            }, error));
     });
 }
 function requestMethod(url, method, requestInit, interceptor, ContentType) {
@@ -178,48 +197,33 @@ function requestMethod(url, method, requestInit, interceptor, ContentType) {
     if (!headers) {
         headers = {};
     }
-    if (Reflect.get(headers, 'Content-type') && !(requestInit.body instanceof FormData)) {
-        Reflect.set(headers, 'Content-type', ContentType || "application/json");
+    if (Reflect.get(headers, "Content-type") &&
+        !(requestInit.body instanceof FormData)) {
+        Reflect.set(headers, "Content-type", ContentType || "application/json");
     }
     return request(url, Object.assign({}, requestInit, { headers, method }), interceptor);
 }
 function _Get(url, params, requestInit = {}, interceptor) {
-    let enCodeParams = objectToParams(params);
-    enCodeParams = enCodeParams.trim() !== "" ? `?${enCodeParams}` : "";
-    const fullPath = url + enCodeParams;
-    return requestMethod(fullPath, requestType.GET, requestInit, interceptor);
+    return requestMethod(getFullPath(url, params || {}), requestType.GET, requestInit, interceptor);
 }
 function _Post(url, params, requestInit = {}, interceptor) {
-    let body;
-    if (params instanceof FormData) {
-        body = params;
-    }
-    else {
-        body = getBody(params || {});
-    }
+    const body = getRequestBody(params || {});
     return requestMethod(url, requestType.POST, { ...requestInit, body }, interceptor);
 }
 function _Put(url, params, requestInit = {}, interceptor) {
-    let body;
-    if (params instanceof FormData) {
-        body = params;
-    }
-    else {
-        body = getBody(params || {});
-    }
+    const body = getRequestBody(params || {});
     return requestMethod(url, requestType.PUT, { ...requestInit, body }, interceptor);
 }
 function _Delete(url, params, requestInit = {}, interceptor) {
-    const fullPath = getFullPath(params || {}, url);
+    const fullPath = getFullPath(url, params || {});
     return requestMethod(fullPath, requestType.DELETE, requestInit, interceptor);
 }
 
-const noop = () => { };
 class Request {
     baseUrl;
-    requestInterceptor = noop;
-    responseInterceptor = noop;
-    errorInterceptor = noop;
+    requestInterceptor = [];
+    responseInterceptor = [];
+    errorInterceptor = [];
     get interceptor() {
         return {
             requestInterceptor: this.requestInterceptor,
@@ -227,33 +231,46 @@ class Request {
             errorInterceptor: this.errorInterceptor,
         };
     }
-    constructor(baseUrl) {
+    constructor(baseUrl = "") {
         this.baseUrl = baseUrl;
     }
     request(url, cb, params, requestInit) {
         const path = this.getRequestUrl(url);
         return cb(path, params, requestInit, this.interceptor);
     }
+    abortFactory(url, callback, params, requestInit) {
+        const abort = new AbortController();
+        const { signal } = abort;
+        requestInit = requestInit || {};
+        const data = this.request(url, callback, params, {
+            ...requestInit,
+            signal,
+        });
+        return { data, abort };
+    }
     Get(url, params, requestInit) {
-        return this.request(url, _Get, params, requestInit);
+        return this.abortFactory(url, _Get, params, requestInit);
     }
     Post = (url, params, requestInit) => {
-        return this.request(url, _Post, params, requestInit);
+        return this.abortFactory(url, _Post, params, requestInit);
     };
     Put = (url, params, requestInit) => {
-        return this.request(url, _Put, params, requestInit);
+        return this.abortFactory(url, _Put, params, requestInit);
     };
     Delete = (url, params, requestInit) => {
-        return this.request(url, _Delete, params, requestInit);
+        return this.abortFactory(url, _Delete, params, requestInit);
     };
     useRequestInterceptor(callback) {
-        this.requestInterceptor = callback;
+        if (!this.requestInterceptor.includes(callback))
+            this.requestInterceptor.push(callback);
     }
     useResponseInterceptor(callback) {
-        this.responseInterceptor = callback;
+        if (!this.responseInterceptor.includes(callback))
+            this.responseInterceptor.push(callback);
     }
     useErrorInterceptor(callback) {
-        this.errorInterceptor = callback;
+        if (!this.errorInterceptor.includes(callback))
+            this.errorInterceptor.push(callback);
     }
     getRequestUrl(path) {
         if (!isHasHttpPrefix(path)) {
@@ -262,8 +279,30 @@ class Request {
         return path;
     }
 }
+function createFetchRequest(instance) {
+    instance = instance || new Request();
+    return function useFetch(url, options) {
+        options = options || {};
+        const { method = "GET", body = {}, ...initRequest } = options;
+        let _method;
+        switch (String.prototype.toLocaleUpperCase.call(method)) {
+            case "GET":
+                _method = _Get;
+                break;
+            case "POST":
+                _method = _Post;
+                break;
+            case "PUT":
+                _method = _Put;
+                break;
+            default:
+                _method = _Delete;
+        }
+        return instance.abortFactory(url, _method, body, {
+            method,
+            ...initRequest,
+        });
+    };
+}
 
-// @ts-ignore
-const logger = consola;
-
-export { Request, addClassName, addStyles, copy, dateAddMonth, dateAddTime, dateDivideMonth, dateDivideTime, getStyles, logger, removeClassName, removeStyles };
+export { Request, addClassName, addStyles, copy, createFetchRequest, dateAddMonth, dateAddTime, dateDivideMonth, dateDivideTime, getStyles, removeClassName, removeStyles };

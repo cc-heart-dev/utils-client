@@ -1,6 +1,6 @@
 {
   "name": "@cc-heart/utils-client",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "A collection of tools 🔧 commonly used by browsers",
   "main": "dist/index.js",
   "type": "module",

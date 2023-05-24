@@ -1,22 +1,23 @@
 import { objectToParams } from "./shard.js";
 
-enum requestType {
+export enum requestType {
   GET = "GET",
   POST = "POST",
   PUT = "PUT",
   DELETE = "DELETE",
 }
 
-type func = (...args: any[]) => any;
+export type func = (...args: any[]) => any;
 
 interface IInterceptor {
-  requestInterceptor?: func;
-  responseInterceptor?: func;
-  errorInterceptor?: func;
+  requestInterceptor?: Array<func>;
+  responseInterceptor?: Array<func>;
+  errorInterceptor?: Array<func>;
 }
 
 export type params = Record<string, any> | FormData;
 export type requestInit = Omit<RequestInit, "body">;
+
 type ContentType =
   | "application/x-www-form-urlencoded"
   | "application/json"
@@ -26,7 +27,7 @@ function isSpecifyResponseType(contentType: string, reg: RegExp): boolean {
   return reg.test(contentType);
 }
 
-function getFullPath(params: Record<string, unknown>, url: string) {
+function getFullPath(url: string, params: params) {
   let enCodeParams = objectToParams(params);
   enCodeParams = enCodeParams.trim() !== "" ? `?${enCodeParams}` : "";
   const fullPath = url + enCodeParams;
@@ -42,6 +43,16 @@ function getBody(params: Record<string, unknown>) {
   } finally {
     return body;
   }
+}
+
+function getRequestBody(params: params) {
+  let body: string | FormData;
+  if (params instanceof FormData) {
+    body = params;
+  } else {
+    body = getBody(params || {});
+  }
+  return body;
 }
 
 // TODO: Blob ArrayBuffer formData 的判断
@@ -62,7 +73,11 @@ async function request<T>(
   // request interceptor
   const { requestInterceptor, responseInterceptor, errorInterceptor } =
     interceptor;
-  requestInterceptor instanceof Function && requestInterceptor(data);
+  requestInterceptor &&
+    requestInterceptor.reduce((value, fn) => {
+      fn(value);
+      return value;
+    }, data);
   return fetch(url, data)
     .then((response) => {
       const ContentType = response.headers.get("content-type") || "";
@@ -74,14 +89,21 @@ async function request<T>(
     .then((res) => {
       // response interceptor
       return Promise.resolve(
-        responseInterceptor instanceof Function
-          ? (responseInterceptor(res) as T)
+        Array.isArray(responseInterceptor)
+          ? responseInterceptor.reduce((res, fn) => {
+              fn(res);
+              return res;
+            }, res as T)
           : res
       );
     })
     .catch((error) => {
       return Promise.reject(
-        errorInterceptor instanceof Function ? errorInterceptor(error) : error
+        Array.isArray(errorInterceptor) &&
+          errorInterceptor.reduce((error, fn) => {
+            fn(error);
+            return error;
+          }, error)
       );
     });
 }
@@ -97,8 +119,11 @@ function requestMethod<T>(
   if (!headers) {
     headers = {};
   }
-  if (Reflect.get(headers, 'Content-type') && !(requestInit.body instanceof FormData)) {
-    Reflect.set(headers, 'Content-type', ContentType || "application/json")
+  if (
+    Reflect.get(headers, "Content-type") &&
+    !(requestInit.body instanceof FormData)
+  ) {
+    Reflect.set(headers, "Content-type", ContentType || "application/json");
   }
 
   return request(
@@ -114,10 +139,12 @@ export function _Get<Response, U extends params = params>(
   requestInit: requestInit = {},
   interceptor?: IInterceptor
 ): Promise<Response> {
-  let enCodeParams = objectToParams(params);
-  enCodeParams = enCodeParams.trim() !== "" ? `?${enCodeParams}` : "";
-  const fullPath = url + enCodeParams;
-  return requestMethod(fullPath, requestType.GET, requestInit, interceptor);
+  return requestMethod(
+    getFullPath(url, params || {}),
+    requestType.GET,
+    requestInit,
+    interceptor
+  );
 }
 
 export function _Post<Response, U extends params = params>(
@@ -126,14 +153,7 @@ export function _Post<Response, U extends params = params>(
   requestInit: requestInit = {},
   interceptor?: IInterceptor
 ): Promise<Response> {
-  let body: string | FormData
-  if (params instanceof FormData) {
-    body = params
-  }
-  else {
-    body = getBody(params || {});
-  }
-
+  const body = getRequestBody(params || {});
   return requestMethod(
     url,
     requestType.POST,
@@ -148,13 +168,7 @@ export function _Put<Response, U extends params = params>(
   requestInit: requestInit = {},
   interceptor?: IInterceptor
 ): Promise<Response> {
-  let body: string | FormData
-  if (params instanceof FormData) {
-    body = params
-  }
-  else {
-    body = getBody(params || {});
-  }
+  const body = getRequestBody(params || {});
   return requestMethod(
     url,
     requestType.PUT,
@@ -169,6 +183,6 @@ export function _Delete<Response, U extends params = params>(
   requestInit: requestInit = {},
   interceptor?: IInterceptor
 ): Promise<Response> {
-  const fullPath = getFullPath(params as Record<string, any> || {}, url);
+  const fullPath = getFullPath(url, params || {});
   return requestMethod(fullPath, requestType.DELETE, requestInit, interceptor);
 }
