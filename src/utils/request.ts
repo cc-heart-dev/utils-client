@@ -9,7 +9,7 @@ export enum requestType {
 
 export type func = (...args: any[]) => any;
 
-interface IInterceptor {
+export interface IInterceptor {
   requestInterceptor?: Array<func>;
   responseInterceptor?: Array<func>;
   errorInterceptor?: Array<func>;
@@ -18,16 +18,16 @@ interface IInterceptor {
 export type params = Record<string, any> | FormData;
 export type requestInit = Omit<RequestInit, "body">;
 
-type ContentType =
-  | "application/x-www-form-urlencoded"
-  | "application/json"
-  | "multipart/form-data";
+// type ContentType =
+//   | "application/x-www-form-urlencoded"
+//   | "application/json"
+//   | "multipart/form-data";
 
 function isSpecifyResponseType(contentType: string, reg: RegExp): boolean {
   return reg.test(contentType);
 }
 
-function getFullPath(url: string, params: params) {
+export function getFullPath(url: string, params: params) {
   let enCodeParams = objectToParams(params);
   enCodeParams = enCodeParams.trim() !== "" ? `?${enCodeParams}` : "";
   const fullPath = url + enCodeParams;
@@ -45,7 +45,7 @@ function getBody(params: Record<string, unknown>) {
   }
 }
 
-function getRequestBody(params: params) {
+export function getRequestBody(params: params) {
   let body: string | FormData;
   if (params instanceof FormData) {
     body = params;
@@ -55,7 +55,7 @@ function getRequestBody(params: params) {
   return body;
 }
 
-// TODO: Blob ArrayBuffer formData 的判断
+// TODO: Blob ArrayBuffer 的判断
 // function isResponseText(contentType: string): boolean {
 //   return isSpecifyResponseType(contentType, /text\/html/)
 // }
@@ -65,7 +65,7 @@ function isResponseJson(contentType: string): boolean {
   return isSpecifyResponseType(contentType, /application\/json/);
 }
 
-async function request<T>(
+async function fetchRequest<T>(
   url = "",
   data: RequestInit = { method: "GET" },
   interceptor: IInterceptor = {}
@@ -91,98 +91,43 @@ async function request<T>(
       return Promise.resolve(
         Array.isArray(responseInterceptor)
           ? responseInterceptor.reduce((res, fn) => {
-              fn(res);
-              return res;
-            }, res as T)
+            fn(res);
+            return res;
+          }, res as T)
           : res
       );
     })
     .catch((error) => {
       return Promise.reject(
         Array.isArray(errorInterceptor) &&
-          errorInterceptor.reduce((error, fn) => {
-            fn(error);
-            return error;
-          }, error)
+        errorInterceptor.reduce((error, fn) => {
+          fn(error);
+          return error;
+        }, error)
       );
     });
 }
 
-function requestMethod<T>(
+export function request<T>(
   url: string,
   method: requestType,
   requestInit: RequestInit,
   interceptor?: IInterceptor,
-  ContentType?: ContentType
 ): Promise<T> {
   let headers = requestInit.headers;
   if (!headers) {
     headers = {};
   }
   if (
-    Reflect.get(headers, "Content-type") &&
+    !Reflect.get(headers, "Content-type") &&
     !(requestInit.body instanceof FormData)
   ) {
-    Reflect.set(headers, "Content-type", ContentType || "application/json");
+    Reflect.set(headers, "Content-type", "application/json");
   }
 
-  return request(
+  return fetchRequest(
     url,
     Object.assign({}, requestInit, { headers, method }),
     interceptor
   );
-}
-
-export function _Get<Response, U extends params = params>(
-  url: string,
-  params?: U,
-  requestInit: requestInit = {},
-  interceptor?: IInterceptor
-): Promise<Response> {
-  return requestMethod(
-    getFullPath(url, params || {}),
-    requestType.GET,
-    requestInit,
-    interceptor
-  );
-}
-
-export function _Post<Response, U extends params = params>(
-  url: string,
-  params?: U,
-  requestInit: requestInit = {},
-  interceptor?: IInterceptor
-): Promise<Response> {
-  const body = getRequestBody(params || {});
-  return requestMethod(
-    url,
-    requestType.POST,
-    { ...requestInit, body },
-    interceptor
-  );
-}
-
-export function _Put<Response, U extends params = params>(
-  url: string,
-  params?: U,
-  requestInit: requestInit = {},
-  interceptor?: IInterceptor
-): Promise<Response> {
-  const body = getRequestBody(params || {});
-  return requestMethod(
-    url,
-    requestType.PUT,
-    { ...requestInit, body },
-    interceptor
-  );
-}
-
-export function _Delete<Response, U extends params = params>(
-  url: string,
-  params?: U,
-  requestInit: requestInit = {},
-  interceptor?: IInterceptor
-): Promise<Response> {
-  const fullPath = getFullPath(url, params || {});
-  return requestMethod(fullPath, requestType.DELETE, requestInit, interceptor);
 }

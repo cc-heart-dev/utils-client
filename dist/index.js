@@ -1,39 +1,4 @@
 /**
- * @description Append according to the initial time
- * @param { Date } date
- * @param { Number} dayTime
- * @returns Date
- */
-function dateManipulation(date, dayTime, type, dateType = "date") {
-    const time = new Date(date);
-    let curTime;
-    const isDateType = dateType === "date";
-    const getter = isDateType ? "getDate" : "getMonth";
-    const setter = isDateType ? "setDate" : "setMonth";
-    switch (type) {
-        case "increment":
-            curTime = time[getter]() + dayTime;
-            break;
-        default:
-            curTime = time[getter]() - dayTime;
-    }
-    time[setter](curTime);
-    return time;
-}
-function dateAddTime(date, dayTime) {
-    return dateManipulation(date, dayTime, "increment", "date");
-}
-function dateDivideTime(date, dayTime) {
-    return dateManipulation(date, dayTime, "decrement", "date");
-}
-function dateAddMonth(date, month) {
-    return dateManipulation(date, month, "increment", "month");
-}
-function dateDivideMonth(date, dayTime) {
-    return dateManipulation(date, dayTime, "decrement", "month");
-}
-
-/**
  * @description add element class attribute
  * @param { Element } el
  * @param { String } className
@@ -120,6 +85,10 @@ var requestType;
     requestType["PUT"] = "PUT";
     requestType["DELETE"] = "DELETE";
 })(requestType || (requestType = {}));
+// type ContentType =
+//   | "application/x-www-form-urlencoded"
+//   | "application/json"
+//   | "multipart/form-data";
 function isSpecifyResponseType(contentType, reg) {
     return reg.test(contentType);
 }
@@ -159,7 +128,7 @@ function getRequestBody(params) {
 function isResponseJson(contentType) {
     return isSpecifyResponseType(contentType, /application\/json/);
 }
-async function request(url = "", data = { method: "GET" }, interceptor = {}) {
+async function fetchRequest(url = "", data = { method: "GET" }, interceptor = {}) {
     // request interceptor
     const { requestInterceptor, responseInterceptor, errorInterceptor } = interceptor;
     requestInterceptor &&
@@ -192,31 +161,16 @@ async function request(url = "", data = { method: "GET" }, interceptor = {}) {
             }, error));
     });
 }
-function requestMethod(url, method, requestInit, interceptor, ContentType) {
+function request(url, method, requestInit, interceptor) {
     let headers = requestInit.headers;
     if (!headers) {
         headers = {};
     }
-    if (Reflect.get(headers, "Content-type") &&
+    if (!Reflect.get(headers, "Content-type") &&
         !(requestInit.body instanceof FormData)) {
-        Reflect.set(headers, "Content-type", ContentType || "application/json");
+        Reflect.set(headers, "Content-type", "application/json");
     }
-    return request(url, Object.assign({}, requestInit, { headers, method }), interceptor);
-}
-function _Get(url, params, requestInit = {}, interceptor) {
-    return requestMethod(getFullPath(url, params || {}), requestType.GET, requestInit, interceptor);
-}
-function _Post(url, params, requestInit = {}, interceptor) {
-    const body = getRequestBody(params || {});
-    return requestMethod(url, requestType.POST, { ...requestInit, body }, interceptor);
-}
-function _Put(url, params, requestInit = {}, interceptor) {
-    const body = getRequestBody(params || {});
-    return requestMethod(url, requestType.PUT, { ...requestInit, body }, interceptor);
-}
-function _Delete(url, params, requestInit = {}, interceptor) {
-    const fullPath = getFullPath(url, params || {});
-    return requestMethod(fullPath, requestType.DELETE, requestInit, interceptor);
+    return fetchRequest(url, Object.assign({}, requestInit, { headers, method }), interceptor);
 }
 
 class Request {
@@ -224,6 +178,9 @@ class Request {
     requestInterceptor = [];
     responseInterceptor = [];
     errorInterceptor = [];
+    constructor(baseUrl = "") {
+        this.baseUrl = baseUrl;
+    }
     get interceptor() {
         return {
             requestInterceptor: this.requestInterceptor,
@@ -231,34 +188,42 @@ class Request {
             errorInterceptor: this.errorInterceptor,
         };
     }
-    constructor(baseUrl = "") {
-        this.baseUrl = baseUrl;
+    mergeInterceptor(interceptor) {
+        return {
+            requestInterceptor: [...this.requestInterceptor, ...(interceptor.requestInterceptor || [])],
+            responseInterceptor: [...this.responseInterceptor, ...(interceptor.responseInterceptor || [])],
+            errorInterceptor: [...this.errorInterceptor, ...(interceptor.errorInterceptor || [])],
+        };
     }
-    request(url, cb, params, requestInit) {
-        const path = this.getRequestUrl(url);
-        return cb(path, params, requestInit, this.interceptor);
-    }
-    abortFactory(url, callback, params, requestInit) {
+    abortFactory() {
         const abort = new AbortController();
+        return abort;
+    }
+    request(url, method, body, requestInit = {}, interceptor) {
+        const abort = this.abortFactory();
         const { signal } = abort;
-        requestInit = requestInit || {};
-        const data = this.request(url, callback, params, {
-            ...requestInit,
-            signal,
-        });
-        return { data, abort };
+        requestInit = { ...requestInit, signal, method };
+        let path = this.getRequestUrl(url);
+        if ([requestType.GET, requestType.DELETE].includes(method)) {
+            path = getFullPath(path, body || {});
+        }
+        else if ([requestType.PUT, requestType.PUT].includes(method)) {
+            requestInit = { ...requestInit, body: getRequestBody(body || {}) };
+        }
+        interceptor = !!interceptor ? this.mergeInterceptor(interceptor) : this.interceptor;
+        return { data: request(path, method, requestInit, interceptor), abort };
     }
-    Get(url, params, requestInit) {
-        return this.abortFactory(url, _Get, params, requestInit);
+    Get(url, params, requestInit, interceptor) {
+        return this.request(url, requestType.GET, params, requestInit, interceptor);
     }
-    Post = (url, params, requestInit) => {
-        return this.abortFactory(url, _Post, params, requestInit);
+    Post = (url, params, requestInit, interceptor) => {
+        return this.request(url, requestType.POST, params, requestInit, interceptor);
     };
-    Put = (url, params, requestInit) => {
-        return this.abortFactory(url, _Put, params, requestInit);
+    Put = (url, params, requestInit, interceptor) => {
+        return this.request(url, requestType.PUT, params, requestInit, interceptor);
     };
-    Delete = (url, params, requestInit) => {
-        return this.abortFactory(url, _Delete, params, requestInit);
+    Delete = (url, params, requestInit, interceptor) => {
+        return this.request(url, requestType.DELETE, params, requestInit, interceptor);
     };
     useRequestInterceptor(callback) {
         if (!this.requestInterceptor.includes(callback))
@@ -287,22 +252,19 @@ function createFetchRequest(instance) {
         let _method;
         switch (String.prototype.toLocaleUpperCase.call(method)) {
             case "GET":
-                _method = _Get;
+                _method = requestType.GET;
                 break;
             case "POST":
-                _method = _Post;
+                _method = requestType.POST;
                 break;
             case "PUT":
-                _method = _Put;
+                _method = requestType.PUT;
                 break;
             default:
-                _method = _Delete;
+                _method = requestType.DELETE;
         }
-        return instance.abortFactory(url, _method, body, {
-            method,
-            ...initRequest,
-        });
+        return instance?.request(url, _method, body, initRequest);
     };
 }
 
-export { Request, addClassName, addStyles, copy, createFetchRequest, dateAddMonth, dateAddTime, dateDivideMonth, dateDivideTime, getStyles, removeClassName, removeStyles };
+export { Request, addClassName, addStyles, copy, createFetchRequest, getStyles, removeClassName, removeStyles };

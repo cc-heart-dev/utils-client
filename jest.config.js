@@ -19,5 +19,4 @@ export default {
   transformIgnorePatterns: [
     '[/\\\\]node_modules/(?!(antd)/)[/\\\\].+\\.(js|jsx|ts|tsx)$'
   ]
-
 }

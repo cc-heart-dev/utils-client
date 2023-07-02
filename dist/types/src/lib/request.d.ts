@@ -1,5 +1,4 @@
-import { params, requestInit, _Delete, _Get, _Post, _Put, type func, type requestType } from "../utils/request.js";
-type cb = typeof _Delete | typeof _Get | typeof _Post | typeof _Put;
+import { params, requestInit, requestType, type func, type IInterceptor } from "../utils/request.js";
 type requestRepose<U> = {
     data: Promise<U>;
     abort: AbortController;
@@ -9,18 +8,25 @@ export declare class Request<Response> {
     private requestInterceptor;
     private responseInterceptor;
     private errorInterceptor;
+    constructor(baseUrl?: string);
     get interceptor(): {
         requestInterceptor: func[];
         responseInterceptor: func[];
         errorInterceptor: func[];
     };
-    constructor(baseUrl?: string);
-    request<Res = Response, U extends params | FormData = params>(url: string, cb: cb, params?: U, requestInit?: requestInit): Promise<Res>;
-    abortFactory<Res = Response, U extends params = params>(url: string, callback: cb, params?: U, requestInit?: requestInit): requestRepose<Res>;
-    Get<Res = Response, U extends params = params>(url: string, params?: U, requestInit?: requestInit): requestRepose<Res>;
-    Post: <Res = Response, U extends params = params>(url: string, params?: U | undefined, requestInit?: requestInit | undefined) => requestRepose<Res>;
-    Put: <Res = Response, U extends params = params>(url: string, params?: U | undefined, requestInit?: requestInit | undefined) => requestRepose<Res>;
-    Delete: <Res = Response, U extends params = params>(url: string, params?: U | undefined, requestInit?: requestInit | undefined) => requestRepose<Res>;
+    mergeInterceptor(interceptor: IInterceptor): {
+        requestInterceptor: func[];
+        responseInterceptor: func[];
+        errorInterceptor: func[];
+    };
+    abortFactory(): AbortController;
+    request<Res = Response, U extends params | FormData = params>(url: string, method: requestType, body?: U, requestInit?: requestInit & {
+        body?: RequestInit['body'];
+    }, interceptor?: IInterceptor): requestRepose<Res>;
+    Get<U extends params = params>(url: string, params?: U, requestInit?: requestInit, interceptor?: IInterceptor): requestRepose<Response>;
+    Post: <Res = Response, U extends params = params>(url: string, params?: U | undefined, requestInit?: requestInit | undefined, interceptor?: IInterceptor) => requestRepose<Res>;
+    Put: <Res = Response, U extends params = params>(url: string, params?: U | undefined, requestInit?: requestInit | undefined, interceptor?: IInterceptor) => requestRepose<Res>;
+    Delete: <Res = Response, U extends params = params>(url: string, params?: U | undefined, requestInit?: requestInit | undefined, interceptor?: IInterceptor) => requestRepose<Res>;
     useRequestInterceptor(callback: func): void;
     useResponseInterceptor(callback: func): void;
     useErrorInterceptor(callback: func): void;
@@ -30,5 +36,5 @@ interface useFetchOptions {
     method?: requestType;
     body?: params;
 }
-export declare function createFetchRequest<T>(instance?: Request<T>): (url: string, options?: useFetchOptions) => requestRepose<T>;
+export declare function createFetchRequest<T>(instance?: Request<T>): (url: string, options?: useFetchOptions) => requestRepose<T> | undefined;
 export {};

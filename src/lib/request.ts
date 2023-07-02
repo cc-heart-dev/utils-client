@@ -1,22 +1,24 @@
 import {
   params,
   requestInit,
-  _Delete,
-  _Get,
-  _Post,
-  _Put,
+  request,
+  requestType,
+  getFullPath,
+  getRequestBody,
   type func,
-  type requestType,
+  type IInterceptor
 } from "../utils/request.js";
 import { isHasHttpPrefix } from "../utils/shard.js";
 
-type cb = typeof _Delete | typeof _Get | typeof _Post | typeof _Put;
-
 type requestRepose<U> = { data: Promise<U>; abort: AbortController };
 export class Request<Response> {
+
+
   private requestInterceptor: Array<func> = [];
   private responseInterceptor: Array<func> = [];
   private errorInterceptor: Array<func> = [];
+
+  constructor(private readonly baseUrl: string = "") { }
 
   get interceptor() {
     return {
@@ -26,62 +28,75 @@ export class Request<Response> {
     };
   }
 
-  constructor(private readonly baseUrl: string = "") {}
+  mergeInterceptor(interceptor: IInterceptor) {
+    return {
+      requestInterceptor: [...this.requestInterceptor, ...(interceptor.requestInterceptor || [])],
+      responseInterceptor: [...this.responseInterceptor, ...(interceptor.responseInterceptor || [])],
+      errorInterceptor: [...this.errorInterceptor, ...(interceptor.errorInterceptor || [])],
+    }
+  }
+
+
+  abortFactory(): AbortController {
+    const abort = new AbortController();
+    return abort;
+  }
 
   request<Res = Response, U extends params | FormData = params>(
     url: string,
-    cb: cb,
-    params?: U,
-    requestInit?: requestInit
-  ): Promise<Res> {
-    const path = this.getRequestUrl(url);
-    return cb<Res, U>(path, params, requestInit, this.interceptor);
-  }
-  abortFactory<Res = Response, U extends params = params>(
-    url: string,
-    callback: cb,
-    params?: U,
-    requestInit?: requestInit
+    method: requestType,
+    body?: U,
+    requestInit: requestInit & { body?: RequestInit['body'] } = {},
+    interceptor?: IInterceptor,
   ): requestRepose<Res> {
-    const abort = new AbortController();
-    const { signal } = abort;
-    requestInit = requestInit || {};
-    const data: Promise<Res> = this.request(url, callback, params, {
-      ...requestInit,
-      signal,
-    });
-    return { data, abort };
+    const abort = this.abortFactory()
+    const { signal } = abort
+    requestInit = { ...requestInit, signal, method }
+    let path = this.getRequestUrl(url);
+    if ([requestType.GET, requestType.DELETE].includes(method)) {
+      path = getFullPath(path, body || {});
+    } else if ([requestType.PUT, requestType.PUT].includes(method)) {
+      requestInit = { ...requestInit, body: getRequestBody(body || {}) };
+    }
+    interceptor = !!interceptor ? this.mergeInterceptor(interceptor) : this.interceptor
+    return { data: request(path, method, requestInit, interceptor), abort }
   }
-  Get<Res = Response, U extends params = params>(
+
+
+  Get<U extends params = params>(
     url: string,
     params?: U,
-    requestInit?: requestInit
-  ): requestRepose<Res> {
-    return this.abortFactory(url, _Get, params, requestInit);
+    requestInit?: requestInit,
+    interceptor?: IInterceptor,
+  ): requestRepose<Response> {
+    return this.request(url, requestType.GET, params, requestInit, interceptor);
   }
 
   Post = <Res = Response, U extends params | FormData = params>(
     url: string,
     params?: U,
-    requestInit?: requestInit
+    requestInit?: requestInit,
+    interceptor?: IInterceptor,
   ): requestRepose<Res> => {
-    return this.abortFactory(url, _Post, params, requestInit);
+    return this.request(url, requestType.POST, params, requestInit, interceptor);
   };
 
   Put = <Res = Response, U extends params = params>(
     url: string,
     params?: U,
-    requestInit?: requestInit
+    requestInit?: requestInit,
+    interceptor?: IInterceptor,
   ): requestRepose<Res> => {
-    return this.abortFactory(url, _Put, params, requestInit);
+    return this.request(url, requestType.PUT, params, requestInit, interceptor);
   };
 
   Delete = <Res = Response, U extends params = params>(
     url: string,
     params?: U,
-    requestInit?: requestInit
+    requestInit?: requestInit,
+    interceptor?: IInterceptor,
   ): requestRepose<Res> => {
-    return this.abortFactory(url, _Delete, params, requestInit);
+    return this.request(url, requestType.DELETE, params, requestInit, interceptor);
   };
 
   useRequestInterceptor(callback: func) {
@@ -116,23 +131,20 @@ export function createFetchRequest<T>(instance?: Request<T>) {
   return function useFetch(url: string, options?: useFetchOptions) {
     options = options || {};
     const { method = "GET", body = {}, ...initRequest } = options;
-    let _method: cb;
+    let _method: requestType;
     switch (String.prototype.toLocaleUpperCase.call(method)) {
       case "GET":
-        _method = _Get;
+        _method = requestType.GET;
         break;
       case "POST":
-        _method = _Post;
+        _method = requestType.POST;
         break;
       case "PUT":
-        _method = _Put;
+        _method = requestType.PUT;
         break;
       default:
-        _method = _Delete;
+        _method = requestType.DELETE;
     }
-    return instance!.abortFactory(url, _method, body, {
-      method,
-      ...initRequest,
-    });
+    return instance?.request(url, _method, body, initRequest)
   };
 }
