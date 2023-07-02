@@ -55,7 +55,7 @@ export class Request<Response> {
     let path = this.getRequestUrl(url);
     if ([requestType.GET, requestType.DELETE].includes(method)) {
       path = getFullPath(path, body || {});
-    } else if ([requestType.PUT, requestType.PUT].includes(method)) {
+    } else if ([requestType.POST, requestType.PUT].includes(method)) {
       requestInit = { ...requestInit, body: getRequestBody(body || {}) };
     }
     interceptor = !!interceptor ? this.mergeInterceptor(interceptor) : this.interceptor
