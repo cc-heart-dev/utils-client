@@ -120,7 +120,7 @@ function getRequestBody(params) {
     }
     return body;
 }
-// TODO: Blob ArrayBuffer formData 的判断
+// TODO: Blob ArrayBuffer 的判断
 // function isResponseText(contentType: string): boolean {
 //   return isSpecifyResponseType(contentType, /text\/html/)
 // }
@@ -207,7 +207,7 @@ class Request {
         if ([requestType.GET, requestType.DELETE].includes(method)) {
             path = getFullPath(path, body || {});
         }
-        else if ([requestType.PUT, requestType.PUT].includes(method)) {
+        else if ([requestType.POST, requestType.PUT].includes(method)) {
             requestInit = { ...requestInit, body: getRequestBody(body || {}) };
         }
         interceptor = !!interceptor ? this.mergeInterceptor(interceptor) : this.interceptor;
