@@ -23,7 +23,7 @@ export declare class Request<Response> {
     request<Res = Response, U extends params | FormData = params>(url: string, method: requestType, body?: U, requestInit?: requestInit & {
         body?: RequestInit['body'];
     }, interceptor?: IInterceptor): requestRepose<Res>;
-    Get<U extends params = params>(url: string, params?: U, requestInit?: requestInit, interceptor?: IInterceptor): requestRepose<Response>;
+    Get<Res = Response, U extends params = params>(url: string, params?: U, requestInit?: requestInit, interceptor?: IInterceptor): requestRepose<Res>;
     Post: <Res = Response, U extends params = params>(url: string, params?: U | undefined, requestInit?: requestInit | undefined, interceptor?: IInterceptor) => requestRepose<Res>;
     Put: <Res = Response, U extends params = params>(url: string, params?: U | undefined, requestInit?: requestInit | undefined, interceptor?: IInterceptor) => requestRepose<Res>;
     Delete: <Res = Response, U extends params = params>(url: string, params?: U | undefined, requestInit?: requestInit | undefined, interceptor?: IInterceptor) => requestRepose<Res>;

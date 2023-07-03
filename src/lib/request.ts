@@ -63,12 +63,12 @@ export class Request<Response> {
   }
 
 
-  Get<U extends params = params>(
+  Get<Res = Response, U extends params = params>(
     url: string,
     params?: U,
     requestInit?: requestInit,
     interceptor?: IInterceptor,
-  ): requestRepose<Response> {
+  ): requestRepose<Res> {
     return this.request(url, requestType.GET, params, requestInit, interceptor);
   }
 
