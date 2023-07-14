@@ -5,20 +5,18 @@ import {
   requestType,
   getFullPath,
   getRequestBody,
-  type func,
-  type IInterceptor
+  type IInterceptor,
 } from "../utils/request.js";
+import type { func } from "../types/helper.js";
 import { isHasHttpPrefix } from "../utils/shard.js";
 
 type requestRepose<U> = { data: Promise<U>; abort: AbortController };
 export class Request<Response> {
-
-
   private requestInterceptor: Array<func> = [];
   private responseInterceptor: Array<func> = [];
   private errorInterceptor: Array<func> = [];
 
-  constructor(private readonly baseUrl: string = "") { }
+  constructor(private readonly baseUrl: string = "") {}
 
   get interceptor() {
     return {
@@ -30,12 +28,20 @@ export class Request<Response> {
 
   mergeInterceptor(interceptor: IInterceptor) {
     return {
-      requestInterceptor: [...this.requestInterceptor, ...(interceptor.requestInterceptor || [])],
-      responseInterceptor: [...this.responseInterceptor, ...(interceptor.responseInterceptor || [])],
-      errorInterceptor: [...this.errorInterceptor, ...(interceptor.errorInterceptor || [])],
-    }
+      requestInterceptor: [
+        ...this.requestInterceptor,
+        ...(interceptor.requestInterceptor || []),
+      ],
+      responseInterceptor: [
+        ...this.responseInterceptor,
+        ...(interceptor.responseInterceptor || []),
+      ],
+      errorInterceptor: [
+        ...this.errorInterceptor,
+        ...(interceptor.errorInterceptor || []),
+      ],
+    };
   }
-
 
   abortFactory(): AbortController {
     const abort = new AbortController();
@@ -46,28 +52,29 @@ export class Request<Response> {
     url: string,
     method: requestType,
     body?: U,
-    requestInit: requestInit & { body?: RequestInit['body'] } = {},
-    interceptor?: IInterceptor,
+    requestInit: requestInit & { body?: RequestInit["body"] } = {},
+    interceptor?: IInterceptor
   ): requestRepose<Res> {
-    const abort = this.abortFactory()
-    const { signal } = abort
-    requestInit = { ...requestInit, signal, method }
+    const abort = this.abortFactory();
+    const { signal } = abort;
+    requestInit = { ...requestInit, signal, method };
     let path = this.getRequestUrl(url);
     if ([requestType.GET, requestType.DELETE].includes(method)) {
       path = getFullPath(path, body || {});
     } else if ([requestType.POST, requestType.PUT].includes(method)) {
       requestInit = { ...requestInit, body: getRequestBody(body || {}) };
     }
-    interceptor = !!interceptor ? this.mergeInterceptor(interceptor) : this.interceptor
-    return { data: request(path, method, requestInit, interceptor), abort }
+    interceptor = !!interceptor
+      ? this.mergeInterceptor(interceptor)
+      : this.interceptor;
+    return { data: request(path, method, requestInit, interceptor), abort };
   }
-
 
   Get<Res = Response, U extends params = params>(
     url: string,
     params?: U,
     requestInit?: requestInit,
-    interceptor?: IInterceptor,
+    interceptor?: IInterceptor
   ): requestRepose<Res> {
     return this.request(url, requestType.GET, params, requestInit, interceptor);
   }
@@ -76,16 +83,22 @@ export class Request<Response> {
     url: string,
     params?: U,
     requestInit?: requestInit,
-    interceptor?: IInterceptor,
+    interceptor?: IInterceptor
   ): requestRepose<Res> => {
-    return this.request(url, requestType.POST, params, requestInit, interceptor);
+    return this.request(
+      url,
+      requestType.POST,
+      params,
+      requestInit,
+      interceptor
+    );
   };
 
   Put = <Res = Response, U extends params = params>(
     url: string,
     params?: U,
     requestInit?: requestInit,
-    interceptor?: IInterceptor,
+    interceptor?: IInterceptor
   ): requestRepose<Res> => {
     return this.request(url, requestType.PUT, params, requestInit, interceptor);
   };
@@ -94,9 +107,15 @@ export class Request<Response> {
     url: string,
     params?: U,
     requestInit?: requestInit,
-    interceptor?: IInterceptor,
+    interceptor?: IInterceptor
   ): requestRepose<Res> => {
-    return this.request(url, requestType.DELETE, params, requestInit, interceptor);
+    return this.request(
+      url,
+      requestType.DELETE,
+      params,
+      requestInit,
+      interceptor
+    );
   };
 
   useRequestInterceptor(callback: func) {
@@ -145,6 +164,6 @@ export function createFetchRequest<T>(instance?: Request<T>) {
       default:
         _method = requestType.DELETE;
     }
-    return instance?.request(url, _method, body, initRequest)
+    return instance?.request(url, _method, body, initRequest);
   };
 }

@@ -1,13 +1,11 @@
 import { objectToParams } from "./shard.js";
-
+import type { func } from "../types/helper.js";
 export enum requestType {
   GET = "GET",
   POST = "POST",
   PUT = "PUT",
   DELETE = "DELETE",
 }
-
-export type func = (...args: any[]) => any;
 
 export interface IInterceptor {
   requestInterceptor?: Array<func>;
@@ -91,19 +89,19 @@ async function fetchRequest<T>(
       return Promise.resolve(
         Array.isArray(responseInterceptor)
           ? responseInterceptor.reduce((res, fn) => {
-            fn(res);
-            return res;
-          }, res as T)
+              fn(res);
+              return res;
+            }, res as T)
           : res
       );
     })
     .catch((error) => {
       return Promise.reject(
         Array.isArray(errorInterceptor) &&
-        errorInterceptor.reduce((error, fn) => {
-          fn(error);
-          return error;
-        }, error)
+          errorInterceptor.reduce((error, fn) => {
+            fn(error);
+            return error;
+          }, error)
       );
     });
 }
@@ -112,7 +110,7 @@ export function request<T>(
   url: string,
   method: requestType,
   requestInit: RequestInit,
-  interceptor?: IInterceptor,
+  interceptor?: IInterceptor
 ): Promise<T> {
   let headers = requestInit.headers;
   if (!headers) {

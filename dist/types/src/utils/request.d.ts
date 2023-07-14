@@ -1,10 +1,10 @@
+import type { func } from "../types/helper.js";
 export declare enum requestType {
     GET = "GET",
     POST = "POST",
     PUT = "PUT",
     DELETE = "DELETE"
 }
-export type func = (...args: any[]) => any;
 export interface IInterceptor {
     requestInterceptor?: Array<func>;
     responseInterceptor?: Array<func>;

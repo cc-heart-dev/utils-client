@@ -54,13 +54,26 @@ function getStyles(el, styles) {
     return Reflect.get(el.style, styles);
 }
 
-function copy(text) {
+const handleInvoke = (callback) => {
+    return (...rest) => {
+        if (typeof window !== "undefined") {
+            callback(...rest);
+        }
+        else {
+            const name = callback.name;
+            console.warn(`The current running environment does not support calling the ${name}`);
+        }
+    };
+};
+
+function clipboard(text) {
     if (navigator.clipboard) {
         navigator.clipboard.writeText(text);
         return;
     }
     console.warn("clipboard is not exist of navigator");
 }
+const copy = handleInvoke(clipboard);
 
 function objectToParams(obj) {
     if (typeof obj === "object") {
@@ -190,9 +203,18 @@ class Request {
     }
     mergeInterceptor(interceptor) {
         return {
-            requestInterceptor: [...this.requestInterceptor, ...(interceptor.requestInterceptor || [])],
-            responseInterceptor: [...this.responseInterceptor, ...(interceptor.responseInterceptor || [])],
-            errorInterceptor: [...this.errorInterceptor, ...(interceptor.errorInterceptor || [])],
+            requestInterceptor: [
+                ...this.requestInterceptor,
+                ...(interceptor.requestInterceptor || []),
+            ],
+            responseInterceptor: [
+                ...this.responseInterceptor,
+                ...(interceptor.responseInterceptor || []),
+            ],
+            errorInterceptor: [
+                ...this.errorInterceptor,
+                ...(interceptor.errorInterceptor || []),
+            ],
         };
     }
     abortFactory() {
@@ -210,7 +232,9 @@ class Request {
         else if ([requestType.POST, requestType.PUT].includes(method)) {
             requestInit = { ...requestInit, body: getRequestBody(body || {}) };
         }
-        interceptor = !!interceptor ? this.mergeInterceptor(interceptor) : this.interceptor;
+        interceptor = !!interceptor
+            ? this.mergeInterceptor(interceptor)
+            : this.interceptor;
         return { data: request(path, method, requestInit, interceptor), abort };
     }
     Get(url, params, requestInit, interceptor) {

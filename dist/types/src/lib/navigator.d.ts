@@ -1,1 +1,1 @@
-export declare function copy(text: string): void;
+export declare const copy: (...rest: any) => void;
