@@ -3,7 +3,8 @@ export declare enum requestType {
     GET = "GET",
     POST = "POST",
     PUT = "PUT",
-    DELETE = "DELETE"
+    DELETE = "DELETE",
+    PATCH = "PATCH"
 }
 export interface IInterceptor {
     requestInterceptor?: Array<func>;

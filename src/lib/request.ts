@@ -103,6 +103,21 @@ export class Request<Response> {
     return this.request(url, requestType.PUT, params, requestInit, interceptor);
   };
 
+  Patch = <Res = Response, U extends params = params>(
+    url: string,
+    params?: U,
+    requestInit?: requestInit,
+    interceptor?: IInterceptor
+  ): requestRepose<Res> => {
+    return this.request(
+      url,
+      requestType.PATCH,
+      params,
+      requestInit,
+      interceptor
+    );
+  };
+
   Delete = <Res = Response, U extends params = params>(
     url: string,
     params?: U,

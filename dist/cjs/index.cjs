@@ -99,6 +99,7 @@ var requestType;
     requestType["POST"] = "POST";
     requestType["PUT"] = "PUT";
     requestType["DELETE"] = "DELETE";
+    requestType["PATCH"] = "PATCH";
 })(requestType || (requestType = {}));
 // type ContentType =
 //   | "application/x-www-form-urlencoded"
@@ -247,6 +248,9 @@ class Request {
     };
     Put = (url, params, requestInit, interceptor) => {
         return this.request(url, requestType.PUT, params, requestInit, interceptor);
+    };
+    Patch = (url, params, requestInit, interceptor) => {
+        return this.request(url, requestType.PATCH, params, requestInit, interceptor);
     };
     Delete = (url, params, requestInit, interceptor) => {
         return this.request(url, requestType.DELETE, params, requestInit, interceptor);

@@ -27,6 +27,7 @@ export declare class Request<Response> {
     Get<Res = Response, U extends params = params>(url: string, params?: U, requestInit?: requestInit, interceptor?: IInterceptor): requestRepose<Res>;
     Post: <Res = Response, U extends params = params>(url: string, params?: U | undefined, requestInit?: requestInit | undefined, interceptor?: IInterceptor) => requestRepose<Res>;
     Put: <Res = Response, U extends params = params>(url: string, params?: U | undefined, requestInit?: requestInit | undefined, interceptor?: IInterceptor) => requestRepose<Res>;
+    Patch: <Res = Response, U extends params = params>(url: string, params?: U | undefined, requestInit?: requestInit | undefined, interceptor?: IInterceptor) => requestRepose<Res>;
     Delete: <Res = Response, U extends params = params>(url: string, params?: U | undefined, requestInit?: requestInit | undefined, interceptor?: IInterceptor) => requestRepose<Res>;
     useRequestInterceptor(callback: func): void;
     useResponseInterceptor(callback: func): void;
