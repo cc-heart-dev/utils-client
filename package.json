@@ -7,6 +7,10 @@
     "build": "rm -rf ./dist && rm -rf ./types && tsc -p tsconfig.build.json && rollup -c",
     "test": "npx jest"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cc-hearts/utils-client.git"
+  },
   "exports": {
     ".": [
       {
@@ -18,7 +22,7 @@
   },
   "./package.json": "./package.json",
   "keywords": [],
-  "author": "heart",
+  "author": "cc heart",
   "license": "MIT",
   "devDependencies": {
     "@rollup/plugin-typescript": "^11.0.0",
@@ -28,6 +32,9 @@
     "@testing-library/jest-dom": "^5.16.5",
     "@types/jest": "^29.5.2",
     "@types/testing-library__jest-dom": "^5.14.5",
+    "commitizen": "^4.3.0",
+    "conventional-changelog-cli": "^4.1.0",
+    "cz-conventional-changelog": "^3.3.0",
     "esm": "^3.2.25",
     "gulp": "^4.0.2",
     "identity-obj-proxy": "^3.0.0",
@@ -40,5 +47,10 @@
   },
   "dependencies": {
     "consola": "^2.15.3"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   }
 }
