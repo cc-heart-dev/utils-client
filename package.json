@@ -1,6 +1,6 @@
 {
   "name": "@cc-heart/utils-client",
-  "version": "0.0.16",
+  "version": "1.0.0",
   "description": "A collection of tools 🔧 commonly used by browsers",
   "type": "module",
   "scripts": {
