@@ -4,7 +4,7 @@
  * @param { String } className
  */
 export function addClassName(el: Element, className: string): void {
-  el.classList.add(className);
+  el.classList.add(className)
 }
 
 /**
@@ -13,7 +13,7 @@ export function addClassName(el: Element, className: string): void {
  * @param { String } className
  **/
 export function removeClassName(el: Element, className: string): void {
-  el.classList.remove(className);
+  el.classList.remove(className)
 }
 
 /**
@@ -24,9 +24,8 @@ export function removeClassName(el: Element, className: string): void {
  * @param styles
  */
 export function addStyles(el: HTMLElement, styles: Record<string, unknown>) {
-  Object.assign(el.style, styles);
+  Object.assign(el.style, styles)
 }
-
 
 /**
  * @description remove element style attribute
@@ -34,12 +33,12 @@ export function addStyles(el: HTMLElement, styles: Record<string, unknown>) {
  * @param { String | String[] } styles
  **/
 export function removeStyles(el: HTMLElement, styles: string | string[]): void {
-  if (typeof styles === "string") {
+  if (typeof styles === 'string') {
     Reflect.set(el.style, styles, '')
   } else {
     styles.forEach((key) => {
       Reflect.set(el.style, key, '')
-    });
+    })
   }
 }
 
@@ -50,7 +49,7 @@ export function removeStyles(el: HTMLElement, styles: string | string[]): void {
  * @returns { String | null }
  */
 export function getStyles(el: HTMLElement, styles: string): string | null {
-  if (!el || !styles) return null;
+  if (!el || !styles) return null
   if (styles === 'float') {
     styles = 'cssFloat'
   }

@@ -10,10 +10,7 @@
       "name": "Launch Chrome against localhost",
       "url": "http://localhost:5173",
       "webRoot": "${workspaceFolder}",
-      "runtimeArgs": [
-        "--auto-open-devtools-for-tabs",
-        "--disable-web-security"
-      ]
+      "runtimeArgs": ["--auto-open-devtools-for-tabs", "--disable-web-security"]
     }
   ]
 }

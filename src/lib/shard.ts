@@ -1,14 +1,14 @@
-import { func } from "../types/helper";
+import { func } from '../types/helper'
 
 export const handleInvoke = (callback: func) => {
   return (...rest: any) => {
-    if (typeof window !== "undefined") {
-      callback(...rest);
+    if (typeof window !== 'undefined') {
+      callback(...rest)
     } else {
-      const name = callback.name;
+      const name = callback.name
       console.warn(
-        `The current running environment does not support calling the ${name}`
-      );
+        `The current running environment does not support calling the ${name}`,
+      )
     }
-  };
-};
+  }
+}

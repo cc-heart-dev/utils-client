@@ -6,17 +6,15 @@ export default {
   moduleNameMapper: {
     '^.+\\.module\\.(css|sass|scss|less)$': 'identity-obj-proxy',
     '\\.svg$': 'identity-obj-proxy',
-    '\\.(css|sass|scss|less)$': 'identity-obj-proxy'
+    '\\.(css|sass|scss|less)$': 'identity-obj-proxy',
   },
   setupFilesAfterEnv: ['<rootDir>/__test__/setupJestDom.ts'],
   testEnvironment: 'jsdom',
-  testMatch: [
-    '<rootDir>/__test__/**/*.{spec,test}.{js,jsx,ts,tsx}'
-  ],
+  testMatch: ['<rootDir>/__test__/**/*.{spec,test}.{js,jsx,ts,tsx}'],
   transform: {
-    '^.+\\.(js|jsx|ts|tsx)$': ['@swc/jest']
+    '^.+\\.(js|jsx|ts|tsx)$': ['@swc/jest'],
   },
   transformIgnorePatterns: [
-    '[/\\\\]node_modules/(?!(antd)/)[/\\\\].+\\.(js|jsx|ts|tsx)$'
-  ]
+    '[/\\\\]node_modules/(?!(antd)/)[/\\\\].+\\.(js|jsx|ts|tsx)$',
+  ],
 }

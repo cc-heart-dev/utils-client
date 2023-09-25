@@ -1,4 +1,4 @@
-import type { func } from "../types/helper.js";
+import type { func } from '../types/helper.js';
 export declare enum requestType {
     GET = "GET",
     POST = "POST",
@@ -12,7 +12,7 @@ export interface IInterceptor {
     errorInterceptor?: Array<func>;
 }
 export type params = Record<string, any> | FormData;
-export type requestInit = Omit<RequestInit, "body">;
+export type requestInit = Omit<RequestInit, 'body'>;
 export declare function getFullPath(url: string, params: params): string;
 export declare function getRequestBody(params: params): string | FormData;
 export declare function request<T>(url: string, method: requestType, requestInit: RequestInit, interceptor?: IInterceptor): Promise<T>;

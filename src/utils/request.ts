@@ -1,21 +1,21 @@
-import { objectToParams } from "./shard.js";
-import type { func } from "../types/helper.js";
+import { objectToParams } from './shard.js'
+import type { func } from '../types/helper.js'
 export enum requestType {
-  GET = "GET",
-  POST = "POST",
-  PUT = "PUT",
-  DELETE = "DELETE",
-  PATCH = "PATCH",
+  GET = 'GET',
+  POST = 'POST',
+  PUT = 'PUT',
+  DELETE = 'DELETE',
+  PATCH = 'PATCH',
 }
 
 export interface IInterceptor {
-  requestInterceptor?: Array<func>;
-  responseInterceptor?: Array<func>;
-  errorInterceptor?: Array<func>;
+  requestInterceptor?: Array<func>
+  responseInterceptor?: Array<func>
+  errorInterceptor?: Array<func>
 }
 
-export type params = Record<string, any> | FormData;
-export type requestInit = Omit<RequestInit, "body">;
+export type params = Record<string, any> | FormData
+export type requestInit = Omit<RequestInit, 'body'>
 
 // type ContentType =
 //   | "application/x-www-form-urlencoded"
@@ -23,35 +23,35 @@ export type requestInit = Omit<RequestInit, "body">;
 //   | "multipart/form-data";
 
 function isSpecifyResponseType(contentType: string, reg: RegExp): boolean {
-  return reg.test(contentType);
+  return reg.test(contentType)
 }
 
 export function getFullPath(url: string, params: params) {
-  let enCodeParams = objectToParams(params);
-  enCodeParams = enCodeParams.trim() !== "" ? `?${enCodeParams}` : "";
-  const fullPath = url + enCodeParams;
-  return fullPath;
+  let enCodeParams = objectToParams(params)
+  enCodeParams = enCodeParams.trim() !== '' ? `?${enCodeParams}` : ''
+  const fullPath = url + enCodeParams
+  return fullPath
 }
 
 function getBody(params: Record<string, unknown>) {
-  let body = "";
+  let body = ''
   try {
-    body = JSON.stringify(params);
+    body = JSON.stringify(params)
   } catch (error) {
-    console.error("params transform error:", error);
+    console.error('params transform error:', error)
   } finally {
-    return body;
+    return body
   }
 }
 
 export function getRequestBody(params: params) {
-  let body: string | FormData;
+  let body: string | FormData
   if (params instanceof FormData) {
-    body = params;
+    body = params
   } else {
-    body = getBody(params || {});
+    body = getBody(params || {})
   }
-  return body;
+  return body
 }
 
 // TODO: Blob ArrayBuffer 的判断
@@ -61,72 +61,72 @@ export function getRequestBody(params: params) {
 // type requestBodyType = ArrayBuffer | Blob | FormData | string | Record<string, any>
 
 function isResponseJson(contentType: string): boolean {
-  return isSpecifyResponseType(contentType, /application\/json/);
+  return isSpecifyResponseType(contentType, /application\/json/)
 }
 
 async function fetchRequest<T>(
-  url = "",
-  data: RequestInit = { method: "GET" },
-  interceptor: IInterceptor = {}
+  url = '',
+  data: RequestInit = { method: 'GET' },
+  interceptor: IInterceptor = {},
 ): Promise<T> {
   // request interceptor
   const { requestInterceptor, responseInterceptor, errorInterceptor } =
-    interceptor;
+    interceptor
   requestInterceptor &&
     requestInterceptor.reduce((value, fn) => {
-      fn(value);
-      return value;
-    }, data);
+      fn(value)
+      return value
+    }, data)
   return fetch(url, data)
     .then((response) => {
-      const ContentType = response.headers.get("content-type") || "";
+      const ContentType = response.headers.get('content-type') || ''
       if (isResponseJson(ContentType)) {
-        return response.json();
+        return response.json()
       }
-      return response.text();
+      return response.text()
     })
     .then((res) => {
       // response interceptor
       return Promise.resolve(
         Array.isArray(responseInterceptor)
           ? responseInterceptor.reduce((res, fn) => {
-              fn(res);
-              return res;
+              fn(res)
+              return res
             }, res as T)
-          : res
-      );
+          : res,
+      )
     })
     .catch((error) => {
       return Promise.reject(
         Array.isArray(errorInterceptor) &&
           errorInterceptor.reduce((error, fn) => {
-            fn(error);
-            return error;
-          }, error)
-      );
-    });
+            fn(error)
+            return error
+          }, error),
+      )
+    })
 }
 
 export function request<T>(
   url: string,
   method: requestType,
   requestInit: RequestInit,
-  interceptor?: IInterceptor
+  interceptor?: IInterceptor,
 ): Promise<T> {
-  let headers = requestInit.headers;
+  let headers = requestInit.headers
   if (!headers) {
-    headers = {};
+    headers = {}
   }
   if (
-    !Reflect.get(headers, "Content-type") &&
+    !Reflect.get(headers, 'Content-type') &&
     !(requestInit.body instanceof FormData)
   ) {
-    Reflect.set(headers, "Content-type", "application/json");
+    Reflect.set(headers, 'Content-type', 'application/json')
   }
 
   return fetchRequest(
     url,
     Object.assign({}, requestInit, { headers, method }),
-    interceptor
-  );
+    interceptor,
+  )
 }
