@@ -1,3 +1,5 @@
+# [1.0.0](https://github.com/cc-hearts/utils-client/compare/v0.0.16...v1.0.0) (2023-09-25)
+
 ## [0.0.16](https://github.com/cc-hearts/utils-client/compare/v0.0.15...v0.0.16) (2023-07-18)
 
 ## [0.0.15](https://github.com/cc-hearts/utils-client/compare/v0.0.14...v0.0.15) (2023-07-14)

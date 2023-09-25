@@ -6,7 +6,8 @@
   "scripts": {
     "build": "rm -rf ./dist && rm -rf ./types && tsc -p tsconfig.build.json && rollup -c",
     "test": "npx jest",
-    "prettier": "prettier --write ."
+    "prettier": "prettier --write .",
+    "changelog": "npx conventional-changelog -p angular -i CHANGELOG.md -s -r 0"
   },
   "repository": {
     "type": "git",
