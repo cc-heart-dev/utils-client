@@ -90,19 +90,19 @@ async function fetchRequest<T>(
       return Promise.resolve(
         Array.isArray(responseInterceptor)
           ? responseInterceptor.reduce((res, fn) => {
-              fn(res)
-              return res
-            }, res as T)
+            fn(res, { url, data })
+            return res
+          }, res as T)
           : res,
       )
     })
     .catch((error) => {
       return Promise.reject(
         Array.isArray(errorInterceptor) &&
-          errorInterceptor.reduce((error, fn) => {
-            fn(error)
-            return error
-          }, error),
+        errorInterceptor.reduce((error, fn) => {
+          fn(error)
+          return error
+        }, error),
       )
     })
 }

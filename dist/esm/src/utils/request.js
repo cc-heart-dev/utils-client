@@ -71,7 +71,7 @@ async function fetchRequest(url = '', data = { method: 'GET' }, interceptor = {}
         // response interceptor
         return Promise.resolve(Array.isArray(responseInterceptor)
             ? responseInterceptor.reduce((res, fn) => {
-                fn(res);
+                fn(res, { url, data });
                 return res;
             }, res)
             : res);
