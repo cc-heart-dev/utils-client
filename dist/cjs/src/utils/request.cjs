@@ -73,7 +73,7 @@ async function fetchRequest(url = '', data = { method: 'GET' }, interceptor = {}
         // response interceptor
         return Promise.resolve(Array.isArray(responseInterceptor)
             ? responseInterceptor.reduce((res, fn) => {
-                fn(res, { url, data });
+                fn(res, { url, data, interceptor });
                 return res;
             }, res)
             : res);
@@ -98,6 +98,7 @@ function request(url, method, requestInit, interceptor) {
     return fetchRequest(url, Object.assign({}, requestInit, { headers, method }), interceptor);
 }
 
+exports.fetchRequest = fetchRequest;
 exports.getFullPath = getFullPath;
 exports.getRequestBody = getRequestBody;
 exports.request = request;

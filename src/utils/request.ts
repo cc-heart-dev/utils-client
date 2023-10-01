@@ -64,7 +64,7 @@ function isResponseJson(contentType: string): boolean {
   return isSpecifyResponseType(contentType, /application\/json/)
 }
 
-async function fetchRequest<T>(
+export async function fetchRequest<T>(
   url = '',
   data: RequestInit = { method: 'GET' },
   interceptor: IInterceptor = {},
@@ -90,7 +90,7 @@ async function fetchRequest<T>(
       return Promise.resolve(
         Array.isArray(responseInterceptor)
           ? responseInterceptor.reduce((res, fn) => {
-            fn(res, { url, data })
+            fn(res, { url, data, interceptor })
             return res
           }, res as T)
           : res,
