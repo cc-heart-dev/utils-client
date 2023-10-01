@@ -87,13 +87,11 @@ export async function fetchRequest<T>(
     })
     .then((res) => {
       // response interceptor
+      if (!Array.isArray(responseInterceptor)) return res
       return Promise.resolve(
-        Array.isArray(responseInterceptor)
-          ? responseInterceptor.reduce((res, fn) => {
-            fn(res, { url, data, interceptor })
-            return res
-          }, res as T)
-          : res,
+        responseInterceptor.reduce(async (res, fn) => {
+          return await fn(res, { url, data, interceptor })
+        }, res as Promise<T>)
       )
     })
     .catch((error) => {

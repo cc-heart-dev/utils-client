@@ -71,12 +71,11 @@ async function fetchRequest(url = '', data = { method: 'GET' }, interceptor = {}
     })
         .then((res) => {
         // response interceptor
-        return Promise.resolve(Array.isArray(responseInterceptor)
-            ? responseInterceptor.reduce((res, fn) => {
-                fn(res, { url, data, interceptor });
-                return res;
-            }, res)
-            : res);
+        if (!Array.isArray(responseInterceptor))
+            return res;
+        return Promise.resolve(responseInterceptor.reduce(async (res, fn) => {
+            return await fn(res, { url, data, interceptor });
+        }, res));
     })
         .catch((error) => {
         return Promise.reject(Array.isArray(errorInterceptor) &&
