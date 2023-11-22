@@ -23,7 +23,9 @@
     ]
   },
   "./package.json": "./package.json",
-  "keywords": [],
+  "keywords": [
+    "Tools in the browser environment"
+  ],
   "author": "cc heart",
   "license": "MIT",
   "devDependencies": {

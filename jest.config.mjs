@@ -7,6 +7,7 @@ export default {
     '^.+\\.module\\.(css|sass|scss|less)$': 'identity-obj-proxy',
     '\\.svg$': 'identity-obj-proxy',
     '\\.(css|sass|scss|less)$': 'identity-obj-proxy',
+    '^@/(.*)$': '<rootDir>/src/$1'
   },
   setupFilesAfterEnv: ['<rootDir>/__test__/setupJestDom.ts'],
   testEnvironment: 'jsdom',

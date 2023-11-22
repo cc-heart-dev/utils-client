@@ -22,10 +22,14 @@
     "noFallthroughCasesInSwitch": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
-    "noEmit": true
+    "noEmit": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    },
   },
+
   "exclude": [
-    "__test__/**/*",
     "node_modules/**/*",
     "rollup.config.js",
     "types/**/*"

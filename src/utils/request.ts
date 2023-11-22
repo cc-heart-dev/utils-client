@@ -1,5 +1,6 @@
 import { objectToParams } from './shard.js'
 import type { func } from '../types/helper.js'
+
 export enum requestType {
   GET = 'GET',
   POST = 'POST',
@@ -16,11 +17,6 @@ export interface IInterceptor {
 
 export type params = Record<string, any> | FormData
 export type requestInit = Omit<RequestInit, 'body'>
-
-// type ContentType =
-//   | "application/x-www-form-urlencoded"
-//   | "application/json"
-//   | "multipart/form-data";
 
 function isSpecifyResponseType(contentType: string, reg: RegExp): boolean {
   return reg.test(contentType)
@@ -53,12 +49,6 @@ export function getRequestBody(params: params) {
   }
   return body
 }
-
-// TODO: Blob ArrayBuffer 的判断
-// function isResponseText(contentType: string): boolean {
-//   return isSpecifyResponseType(contentType, /text\/html/)
-// }
-// type requestBodyType = ArrayBuffer | Blob | FormData | string | Record<string, any>
 
 function isResponseJson(contentType: string): boolean {
   return isSpecifyResponseType(contentType, /application\/json/)
