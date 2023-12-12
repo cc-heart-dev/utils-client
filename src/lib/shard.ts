@@ -3,7 +3,7 @@ import { func } from '../types/helper'
 export const handleInvoke = (callback: func) => {
   return (...rest: any) => {
     if (typeof window !== 'undefined') {
-      callback(...rest)
+      return callback(...rest)
     } else {
       const name = callback.name
       console.warn(
