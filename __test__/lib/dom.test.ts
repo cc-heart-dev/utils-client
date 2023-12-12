@@ -6,6 +6,7 @@ import {
   addClassName,
   removeClassName,
   getStyles,
+  classNames,
 } from '../../src/lib/dom'
 
 function getButtonDOM() {
@@ -81,5 +82,31 @@ describe('get element style attribute value', () => {
     const el = getByText(container, 'float example')
     const attributeValue = getStyles(el, 'float')
     expect(attributeValue).toBe('left')
+  })
+})
+
+
+describe('classNames', () => {
+  it('should return an empty string for no arguments', () => {
+    expect(classNames()).toBe('')
+  })
+
+  it('should return a single class for a single string argument', () => {
+    expect(classNames('foo')).toBe('foo')
+    expect(classNames(true)).toBe('true')
+    expect(classNames(123)).toBe('123')
+
+  })
+
+  it('should return multiple classes for multiple string arguments', () => {
+    expect(classNames('foo', 'bar')).toBe('foo bar')
+    expect(classNames(true, false)).toBe('true')
+    expect(classNames(123, 456)).toBe('123 456')
+    expect(classNames(['foo', 'bar'])).toBe('foo bar')
+    expect(classNames(['foo', 'bar'], ['baz', 'qux'])).toBe('foo bar baz qux')
+    expect(classNames({ foo: true, bar: false })).toBe('foo')
+    expect(classNames({ foo: true, bar: false }, { baz: true, qux: false })).toBe('foo baz')
+    expect(classNames('foo', true, 123, ['bar', 'baz'], { qux: false }))
+      .toBe('foo true 123 bar baz')
   })
 })
