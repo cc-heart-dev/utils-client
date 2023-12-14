@@ -1,21 +1,23 @@
 import { isBool, isObject } from '@cc-heart/utils'
 
 /**
- * @description add element class attribute
- * @param { Element } el
- * @param { String } className
+ * Adds one or more class names to the class list of the given element.
+ *
+ * @param el - The element to which the class names will be added.
+ * @param classNames - The class names to be added.
  */
-export function addClassName(el: Element, className: string): void {
-  el.classList.add(className)
+export function addClassName(el: Element, ...classNames: string[]): void {
+  el.classList.add(...classNames)
 }
 
 /**
- * @description remove element class attribute
- * @param { Element } el
- * @param { String } className
- **/
-export function removeClassName(el: Element, className: string): void {
-  el.classList.remove(className)
+ * Removes one or more class names from the class list of the given element.
+ *
+ * @param el - The element from which the class name will be removed.
+ * @param classNames - The class names to be removed.
+ */
+export function removeClassName(el: Element, ...classNames: string[]): void {
+  el.classList.remove(...classNames)
 }
 
 /**

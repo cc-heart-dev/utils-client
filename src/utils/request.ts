@@ -1,5 +1,5 @@
-import { objectToParams } from './shard.js'
-import type { func } from '../types/helper.js'
+import { objectToQueryString } from '@cc-heart/utils'
+import type { fn } from '@cc-heart/utils/helper'
 
 export enum requestType {
   GET = 'GET',
@@ -10,9 +10,9 @@ export enum requestType {
 }
 
 export interface IInterceptor {
-  requestInterceptor?: Array<func>
-  responseInterceptor?: Array<func>
-  errorInterceptor?: Array<func>
+  requestInterceptor?: Array<fn>
+  responseInterceptor?: Array<fn>
+  errorInterceptor?: Array<fn>
 }
 
 export type params = Record<string, any> | FormData
@@ -23,7 +23,7 @@ function isSpecifyResponseType(contentType: string, reg: RegExp): boolean {
 }
 
 export function getFullPath(url: string, params: params) {
-  let enCodeParams = objectToParams(params)
+  let enCodeParams = objectToQueryString(params)
   enCodeParams = enCodeParams.trim() !== '' ? `?${enCodeParams}` : ''
   const fullPath = url + enCodeParams
   return fullPath

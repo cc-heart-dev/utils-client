@@ -7,14 +7,14 @@ import {
   getRequestBody,
   type IInterceptor,
 } from '../utils/request.js'
-import type { func } from '../types/helper.js'
-import { isHasHttpPrefix } from '../utils/shard.js'
+import type { fn } from '@cc-heart/utils/helper'
+import { isHasHttpPrefix } from '../utils/valid.js'
 
 type requestRepose<U> = { data: Promise<U>; abort: AbortController }
 export class Request<Response> {
-  private requestInterceptor: Array<func> = []
-  private responseInterceptor: Array<func> = []
-  private errorInterceptor: Array<func> = []
+  private requestInterceptor: Array<fn> = []
+  private responseInterceptor: Array<fn> = []
+  private errorInterceptor: Array<fn> = []
 
   constructor(private readonly baseUrl: string = '') {}
 
@@ -127,17 +127,17 @@ export class Request<Response> {
     )
   }
 
-  useRequestInterceptor(callback: func) {
+  useRequestInterceptor(callback: fn) {
     if (!this.requestInterceptor.includes(callback))
       this.requestInterceptor.push(callback)
   }
 
-  useResponseInterceptor(callback: func) {
+  useResponseInterceptor(callback: fn) {
     if (!this.responseInterceptor.includes(callback))
       this.responseInterceptor.push(callback)
   }
 
-  useErrorInterceptor(callback: func) {
+  useErrorInterceptor(callback: fn) {
     if (!this.errorInterceptor.includes(callback))
       this.errorInterceptor.push(callback)
   }
