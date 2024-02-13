@@ -70,7 +70,9 @@ export function getStyles(el: HTMLElement, styles: string): string | null {
  *
  * @returns {string} A string of class names separated by spaces.
  */
-export function classNames(...params: (string | boolean | number | string[] | Record<string, any>)[]) {
+export function classNames(
+  ...params: (string | boolean | number | string[] | Record<string, any>)[]
+) {
   return params
     .reduce<string[]>((acc, cur) => {
       if (Array.isArray(cur)) {
@@ -92,5 +94,3 @@ export function classNames(...params: (string | boolean | number | string[] | Re
     }, [])
     .join(' ')
 }
-
-

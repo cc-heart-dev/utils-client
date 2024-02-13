@@ -3,9 +3,8 @@
  * @param prefix - the namespace for the BEM blocks
  */
 export function generateCssNamespaceFn(prefix: string) {
-
   return function defineCssNamespace(namespace: string) {
-    const cls = namespace ? `${prefix}-${namespace}` : prefix;
+    const cls = namespace ? `${prefix}-${namespace}` : prefix
 
     /**
      * Create a BEM block with an optional block suffix.
@@ -37,7 +36,9 @@ export function generateCssNamespaceFn(prefix: string) {
      * @param element - the optional element name
      */
     const be = (blockSuffix?: string, element?: string) => {
-      return (blockSuffix && element && `${cls}-${blockSuffix}__${element}`) || ''
+      return (
+        (blockSuffix && element && `${cls}-${blockSuffix}__${element}`) || ''
+      )
     }
 
     /**
@@ -76,10 +77,10 @@ export function generateCssNamespaceFn(prefix: string) {
       )
     }
 
-   /**
-    * Generate CSS styles from a map of CSS variable names and values.
-    * @param target - a map of CSS variable names and values
-    */
+    /**
+     * Generate CSS styles from a map of CSS variable names and values.
+     * @param target - a map of CSS variable names and values
+     */
     const genCssVar = (target: Record<string, string>) => {
       const styles: Record<string, string> = {}
       Object.keys(target).forEach((key) => {

@@ -1,4 +1,3 @@
-
 // browser
 declare module globalThis {
   interface FormData {

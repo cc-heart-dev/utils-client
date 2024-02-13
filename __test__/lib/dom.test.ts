@@ -85,7 +85,6 @@ describe('get element style attribute value', () => {
   })
 })
 
-
 describe('classNames', () => {
   it('should return an empty string for no arguments', () => {
     expect(classNames()).toBe('')
@@ -95,7 +94,6 @@ describe('classNames', () => {
     expect(classNames('foo')).toBe('foo')
     expect(classNames(true)).toBe('true')
     expect(classNames(123)).toBe('123')
-
   })
 
   it('should return multiple classes for multiple string arguments', () => {
@@ -105,8 +103,11 @@ describe('classNames', () => {
     expect(classNames(['foo', 'bar'])).toBe('foo bar')
     expect(classNames(['foo', 'bar'], ['baz', 'qux'])).toBe('foo bar baz qux')
     expect(classNames({ foo: true, bar: false })).toBe('foo')
-    expect(classNames({ foo: true, bar: false }, { baz: true, qux: false })).toBe('foo baz')
-    expect(classNames('foo', true, 123, ['bar', 'baz'], { qux: false }))
-      .toBe('foo true 123 bar baz')
+    expect(
+      classNames({ foo: true, bar: false }, { baz: true, qux: false }),
+    ).toBe('foo baz')
+    expect(classNames('foo', true, 123, ['bar', 'baz'], { qux: false })).toBe(
+      'foo true 123 bar baz',
+    )
   })
 })

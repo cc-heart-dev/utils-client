@@ -1,6 +1,5 @@
 import { copyFormData } from '@/lib/formData'
 
-
 describe('formData module', () => {
   test('copy formData', () => {
     const formData = new FormData()
