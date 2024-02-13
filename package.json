@@ -1,6 +1,6 @@
 {
   "name": "@cc-heart/utils-client",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "A collection of tools 🔧 commonly used by browsers",
   "type": "module",
   "author": "Carl Chen",
@@ -9,7 +9,7 @@
     "build": "rm -rf ./dist && rm -rf ./types && tsc -p tsconfig.build.json && rollup -c",
     "test": "npx jest",
     "prettier": "prettier --write .",
-    "changelog": "npx conventional-changelog -i CHANGELOG.md -s -r 0"
+    "changelog": "npx conventional-changelog -i NEW_CHANGELOG.md -s -r 0"
   },
   "repository": {
     "type": "git",
