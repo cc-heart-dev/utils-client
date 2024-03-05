@@ -22,7 +22,9 @@
         "types": "./dist/types/index.d.ts",
         "require": "./dist/cjs/index.cjs"
       }
-    ]
+    ],
+    "./scss/*": "./src/assets/scss/*",
+    "./*": "./*"
   },
   "./package.json": "./package.json",
   "keywords": [
