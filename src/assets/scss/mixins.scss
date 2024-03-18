@@ -1,10 +1,5 @@
 @use './utils/string.scss' as *;
-
-$namespace: cc !default;
-$common-separator: '-' !default;
-$element-separator: '__' !default;
-$modifier-separator: '--' !default;
-$is-at-root: true !default;
+@import './variable.scss';
 
 $b: null;
 $e: null;
@@ -24,7 +19,6 @@ $m: null;
 
 @mixin b($block) {
   $b: join($namespace, $common-separator, $block) !global; // 局部变量
-  @debug $namespace;
 
   .#{$b} {
     @content;

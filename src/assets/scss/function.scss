@@ -1,6 +1,4 @@
-@use './variable.scss' as *;
-
-$namespace: cc !default;
+@import './variable.scss';
 
 @function joinVar($args...) {
   $namespaces: --#{$namespace};
