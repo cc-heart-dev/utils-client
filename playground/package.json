@@ -22,6 +22,7 @@
   },
   "devDependencies": {
     "@cc-heart/utils": "^5.2.0",
+    "@cc-heart/utils-client": "^2.0.2",
     "@types/splitpanes": "^2.2.6",
     "@unocss/nuxt": "^0.60.3",
     "monaco-editor": "^0.48.0",

@@ -22,6 +22,9 @@ devDependencies:
   '@cc-heart/utils':
     specifier: ^5.2.0
     version: 5.2.0
+  '@cc-heart/utils-client':
+    specifier: ^2.0.2
+    version: 2.0.2
   '@types/splitpanes':
     specifier: ^2.2.6
     version: 2.2.6
@@ -397,6 +400,10 @@ packages:
       commander: 11.1.0
       inquirer: 9.2.22
     dev: false
+
+  /@cc-heart/utils-client@2.0.2:
+    resolution: {integrity: sha512-Y59w0CzO/v5rzgVheUL665HHMCxBxBvm/OFYsTTIqrjrM5NdPltQqrrOcC4yfPGz4z1K74wHMXulyIMmORogww==}
+    dev: true
 
   /@cc-heart/utils@5.2.0:
     resolution: {integrity: sha512-uM3lksTQ0Nrcnogfzy33qyxcB/JpHOHyeSrH67jxFaQbcnnhM9OShqHWfgi+t/MhJL8DRvlrmUqKd4FrB8RaAA==}
@@ -1322,6 +1329,7 @@ packages:
     dependencies:
       is-glob: 4.0.3
       micromatch: 4.0.7
+      napi-wasm: 1.1.0
     dev: false
     bundledDependencies:
       - napi-wasm
@@ -4790,6 +4798,10 @@ packages:
     resolution: {integrity: sha512-oLxFY2gd2IqnjcYyOXD8XGCftpGtZP2AbHbOkthDkvRywH5ayNtPVy9YlOPcHckXzbLTCHpkb7FB+yuxKV13pQ==}
     engines: {node: ^18 || >=20}
     hasBin: true
+    dev: false
+
+  /napi-wasm@1.1.0:
+    resolution: {integrity: sha512-lHwIAJbmLSjF9VDRm9GoVOy9AGp3aIvkjv+Kvz9h16QR3uSVYH78PNQUnT2U4X53mhlnV2M7wrhibQ3GHicDmg==}
     dev: false
 
   /negotiator@0.6.3:

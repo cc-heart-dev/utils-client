@@ -18,10 +18,15 @@
 import { Pane, Splitpanes } from 'splitpanes'
 import { MonacoEditor } from '~/components/monaco-editor';
 import { compile } from '~/utils/compile';
+import { presetScss } from './scss';
 
 const compiledCssStr = ref('')
+const runtimeConfig = useRuntimeConfig()
+console.log(runtimeConfig);
+
 const handleChangeScssStr = (scssStr: string) => {
-  compile(scssStr).then(res => {
+  const compileScss = presetScss + '\n' + scssStr
+  compile(compileScss).then(res => {
     compiledCssStr.value = res?.css || ''
   })
 }
