@@ -1,6 +1,7 @@
 @use './utils/string.scss' as *;
 @import './variable.scss';
 
+$ns: '';
 $b: null;
 $e: null;
 $m: null;
@@ -17,8 +18,23 @@ $m: null;
   }
 }
 
+@mixin ns($namespace) {
+  $ns: join($namespace, $common-separator, $namespace) !global;
+
+  .#{$ns} {
+    @content;
+  }
+}
+
 @mixin b($block) {
-  $b: join($namespace, $common-separator, $block) !global; // 局部变量
+  @if ($ns =='') {
+    $b: join($namespace, $common-separator, $block) !global;
+  }
+
+  else {
+    $b: join($namespace, $common-separator, $ns, $common-separator, $block) !global;
+  }
+
 
   .#{$b} {
     @content;
@@ -26,13 +42,12 @@ $m: null;
 }
 
 @mixin e($element...) {
-  $e: #{$b};
   $currentSelector: (
   );
 
 @each $item in $element {
   $currentSelector: append($currentSelector,
-      join($e, $element-separator, $item),
+      join($b, $element-separator, $item),
       comma);
 }
 
