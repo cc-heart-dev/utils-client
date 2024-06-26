@@ -1,8 +1,10 @@
-import tsConfig from './tsconfig.json' assert { type: 'json' }
 import typescript from '@rollup/plugin-typescript'
 import resolve from '@rollup/plugin-node-resolve'
 import commonjs from '@rollup/plugin-commonjs'
+import { readFileSync } from 'fs'
 
+let tsConfig = readFileSync('./tsconfig.json')
+tsConfig = JSON.parse(tsConfig)
 tsConfig.compilerOptions.declaration = false
 
 export default {
