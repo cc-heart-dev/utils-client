@@ -1,5 +1,5 @@
 import { objectToQueryString } from '@cc-heart/utils'
-import type { fn } from '@cc-heart/utils/helper'
+import type { Fn } from '@cc-heart/utils/helper'
 
 export enum requestType {
   GET = 'GET',
@@ -10,9 +10,9 @@ export enum requestType {
 }
 
 export interface IInterceptor {
-  requestInterceptor?: Array<fn>
-  responseInterceptor?: Array<fn>
-  errorInterceptor?: Array<fn>
+  requestInterceptor?: Array<Fn>
+  responseInterceptor?: Array<Fn>
+  errorInterceptor?: Array<Fn>
 }
 
 export type params = Record<string, any> | FormData

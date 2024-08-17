@@ -1,6 +1,6 @@
-import type { fn } from '@cc-heart/utils/helper'
+import type { Fn } from '@cc-heart/utils/helper'
 
-export const handleInvoke = (callback: fn) => {
+export const handleInvoke = (callback: Fn) => {
   return (...rest: any) => {
     if (typeof window !== 'undefined') {
       return callback(...rest)

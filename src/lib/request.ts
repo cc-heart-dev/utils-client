@@ -5,16 +5,16 @@ import {
   requestType,
   getFullPath,
   getRequestBody,
-  type IInterceptor,
 } from '../utils/request.js'
-import type { fn } from '@cc-heart/utils/helper'
+import type { IInterceptor } from '../utils/request'
+import type { Fn } from '@cc-heart/utils/helper'
 import { isHasHttpPrefix } from '../utils/valid.js'
 
 type requestRepose<U> = { data: Promise<U>; abort: AbortController }
 export class Request<Response> {
-  private requestInterceptor: Array<fn> = []
-  private responseInterceptor: Array<fn> = []
-  private errorInterceptor: Array<fn> = []
+  private requestInterceptor: Array<Fn> = []
+  private responseInterceptor: Array<Fn> = []
+  private errorInterceptor: Array<Fn> = []
 
   constructor(private readonly baseUrl: string = '') {}
 
@@ -127,17 +127,17 @@ export class Request<Response> {
     )
   }
 
-  useRequestInterceptor(callback: fn) {
+  useRequestInterceptor(callback: Fn) {
     if (!this.requestInterceptor.includes(callback))
       this.requestInterceptor.push(callback)
   }
 
-  useResponseInterceptor(callback: fn) {
+  useResponseInterceptor(callback: Fn) {
     if (!this.responseInterceptor.includes(callback))
       this.responseInterceptor.push(callback)
   }
 
-  useErrorInterceptor(callback: fn) {
+  useErrorInterceptor(callback: Fn) {
     if (!this.errorInterceptor.includes(callback))
       this.errorInterceptor.push(callback)
   }
