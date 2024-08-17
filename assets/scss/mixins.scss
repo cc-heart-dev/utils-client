@@ -2,7 +2,7 @@
 @import './variable.scss';
 
 $ns: '';
-$b: null;
+$b: '';
 $e: null;
 $m: null;
 
@@ -18,8 +18,8 @@ $m: null;
   }
 }
 
-@mixin ns($namespace) {
-  $ns: join($namespace, $common-separator, $namespace) !global;
+@mixin ns($namespace_scope) {
+  $ns: join($namespace, $common-separator, $namespace_scope) !global;
 
   .#{$ns} {
     @content;
@@ -32,12 +32,14 @@ $m: null;
   }
 
   else {
-    $b: join($namespace, $common-separator, $ns, $common-separator, $block) !global;
+    $b: join($ns, $common-separator, $block) !global;
   }
 
 
-  .#{$b} {
-    @content;
+  @include isAtRoot {
+    .#{$b} {
+      @content;
+    }
   }
 }
 
