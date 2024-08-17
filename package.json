@@ -6,7 +6,8 @@
   "author": "Carl Chen",
   "license": "MIT",
   "files": [
-    "dist"
+    "dist",
+    "assets"
   ],
   "scripts": {
     "build": "rm -rf ./dist && rm -rf ./types && tsc -p tsconfig.build.json && rollup -c",
@@ -26,7 +27,7 @@
         "require": "./dist/cjs/index.cjs"
       }
     ],
-    "./scss/*": "./src/assets/scss/*",
+    "./scss/*": "./assets/scss/*",
     "./*": "./*"
   },
   "./package.json": "./package.json",
