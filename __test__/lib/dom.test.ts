@@ -7,6 +7,8 @@ import {
   removeClassName,
   getStyles,
   classNames,
+  getPadding,
+  isHidden,
 } from '../../src/lib/dom'
 
 function getButtonDOM() {
@@ -83,6 +85,13 @@ describe('get element style attribute value', () => {
     const attributeValue = getStyles(el, 'float')
     expect(attributeValue).toBe('left')
   })
+
+  it('should return a null when get invalid element or style', () => {
+    // @ts-ignore
+    expect(getStyles(null, 'float')).toBeNull();
+
+    expect(getStyles(document.createElement('div'), '')).toBeNull()
+  })
 })
 
 describe('classNames', () => {
@@ -111,3 +120,78 @@ describe('classNames', () => {
     )
   })
 })
+
+describe('getPadding function', () => {
+  it('should return correct padding values for an element', () => {
+    const mockElement = document.createElement('div');
+    mockElement.style.paddingLeft = '10px';
+    mockElement.style.paddingRight = '20px';
+    mockElement.style.paddingTop = '30px';
+    mockElement.style.paddingBottom = '40px';
+
+    const padding = getPadding(mockElement);
+
+    expect(padding.left).toBe(10);
+    expect(padding.right).toBe(20);
+    expect(padding.top).toBe(30);
+    expect(padding.bottom).toBe(40);
+  });
+});
+
+
+describe('isHidden function', () => {
+  let _get = Range.prototype.getBoundingClientRect
+  beforeEach(() => {
+    Range.prototype.getBoundingClientRect = () => {
+      return {
+        width: 0,
+        height: 0,
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+      } as DOMRect
+    }
+  })
+
+  afterEach(() => {
+    Range.prototype.getBoundingClientRect = _get
+  })
+
+  it('should return false for a visible element', () => {
+    const mockElement = document.createElement('div');
+    mockElement.style.width = '100px';
+    mockElement.style.height = '100px';
+
+    const isElementHidden = isHidden(mockElement);
+
+    expect(isElementHidden).toBe(false);
+  });
+
+  it('should return true when element has larger range height than its height', () => {
+    const mockElement = document.createElement('div');
+    mockElement.style.width = '100px';
+    mockElement.style.height = '50px';
+
+    jest.spyOn(mockElement, 'getBoundingClientRect').mockReturnValue({
+      width: 0,
+      height: 50
+    } as DOMRect);
+
+    Range.prototype.getBoundingClientRect = () => {
+      return {
+        width: 0,
+        height: 70,
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+      } as DOMRect
+    }
+
+    const isElementHidden = isHidden(mockElement);
+
+    expect(isElementHidden).toBe(true);
+  });
+
+});

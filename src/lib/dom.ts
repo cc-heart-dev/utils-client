@@ -63,12 +63,12 @@ export function getStyles(el: HTMLElement, styles: string): string | null {
 /**
  * Generates a string of class names from the provided arguments.
  *
- * @param {...(string | boolean | number | string[] | Record<string, any>)[]} params - The arguments can be a mix of strings, numbers, booleans, arrays of strings, or objects.
+ * @param params - The arguments can be a mix of strings, numbers, booleans, arrays of strings, or objects.
  * Strings, numbers, and truthy booleans are added directly to the class names.
  * Arrays are flattened and their string elements are added to the class names.
  * Objects are treated as {className: condition} pairs; class names with truthy conditions are added.
  *
- * @returns {string} A string of class names separated by spaces.
+ * @returns A string of class names separated by spaces.
  */
 export function classNames(
   ...params: (string | boolean | number | string[] | Record<string, any>)[]
@@ -93,4 +93,48 @@ export function classNames(
       return [...acc, cur]
     }, [])
     .join(' ')
+}
+
+/**
+ * Retrieves the padding values of an HTML element.
+ *
+ * @param el - The HTML element for which to get the padding.
+ * @returns An object containing the left, right, top, and bottom padding values of the element.
+ */
+export const getPadding = (el: HTMLElement) => {
+  const parseInt = (target: string) => Number.parseInt(target) || 0
+
+  const style = window.getComputedStyle(el, null)
+  const left = parseInt(style.paddingLeft)
+  const right = parseInt(style.paddingRight)
+  const top = parseInt(style.paddingTop)
+  const bottom = parseInt(style.paddingBottom)
+
+  return { left, right, top, bottom }
+}
+
+/**
+ * Checks if a given HTML element is hidden.
+ *
+ * @param el - The HTML element to be checked.
+ * @returns Returns true if the element is hidden, otherwise false.
+ */
+export const isHidden = (el: HTMLElement) => {
+  const range = document.createRange()
+  range.setStart(el, 0)
+  range.setEnd(el, el.childNodes.length)
+
+  const { width: rangeWidth, height: rangeHeight } =
+    range.getBoundingClientRect()
+  const { width, height } = el.getBoundingClientRect()
+
+  const { left, top, bottom, right } = getPadding(el)
+  const verPadding = top + bottom
+  const horPadding = left + right
+
+  return (
+    rangeHeight + verPadding > height ||
+    rangeWidth + horPadding > width ||
+    el.scrollWidth > el.clientWidth
+  )
 }
