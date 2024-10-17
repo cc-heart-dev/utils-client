@@ -1,6 +1,6 @@
 {
   "name": "@cc-heart/utils-client",
-  "version": "2.0.7",
+  "version": "2.0.8",
   "description": "A collection of tools 🔧 commonly used by browsers",
   "type": "module",
   "author": "Carl Chen",
