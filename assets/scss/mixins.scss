@@ -1,5 +1,5 @@
 @use './utils/string.scss' as *;
-@import './variable.scss';
+@use './variable.scss' as *;
 
 $ns: '';
 $b: '';
