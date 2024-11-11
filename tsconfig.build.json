@@ -30,6 +30,7 @@
     "__test__/**/*",
     "node_modules/**/*",
     "rollup.config.js",
-    "types/**/*"
+    "types/**/*",
+    "playground/**/*",
   ]
 }
