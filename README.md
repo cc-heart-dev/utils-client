@@ -10,11 +10,19 @@ pnpm add @cc-heart/utils-client
 
 ### Scss Usage
 
+create a overwrite file (e.g. overwrite.scss), and write following content:
+
+```scss
+@forward '@cc-heart/utils-client/scss/variable.scss' with (
+  $namespace: 'cc'
+);
+```
+
 create a new scss file (e.g. `lib.scss`), and write following content:
 
 ```scss
-@use '@cc-heart/utils-client/scss/function.scss' as *;
-@use '@cc-heart/utils-client/scss/mixins.scss' as *;
+@use './override.scss' as *;
 
-$namespace: cc !global;
+@forward '@cc-heart/utils-client/scss/function.scss';
+@forward '@cc-heart/utils-client/scss/mixins.scss';
 ```
