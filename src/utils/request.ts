@@ -87,10 +87,10 @@ export async function fetchRequest<T>(
     .catch((error) => {
       return Promise.reject(
         Array.isArray(errorInterceptor) &&
-          errorInterceptor.reduce((error, fn) => {
-            fn(error)
-            return error
-          }, error),
+        errorInterceptor.reduce((error, fn) => {
+          fn(error)
+          return error
+        }, error),
       )
     })
 }
