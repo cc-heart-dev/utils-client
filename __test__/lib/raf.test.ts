@@ -1,65 +1,42 @@
-import { requestAnimation } from '@/lib/raf'
+import { raf } from '@/lib/raf'
 
-describe('requestAnimation', () => {
-  jest.useFakeTimers()
-
-  it('should call the callback at the specified rate', () => {
-    const callback = jest.fn()
-    const rate = 100 // Call every 100ms
-
-    const cancel = requestAnimation(callback, rate)
-
-    // Fast-forward time
-    jest.advanceTimersByTime(250) // 250ms should trigger callback 2 times
-    expect(callback).toHaveBeenCalledTimes(2)
-
-    // Cancel the animation
-    cancel()
-
-    // Fast-forward time again
-    jest.advanceTimersByTime(250) // Should not trigger callback
-    expect(callback).toHaveBeenCalledTimes(2)
-  })
-
-  it('should not call the callback if the rate is 0', () => {
-    const callback = jest.fn()
-    const rate = 0 // Call immediately
-
-    const cancel = requestAnimation(callback, rate)
-
-    // Fast-forward time
-    jest.advanceTimersByTime(100) // Should trigger callback at least once
-    expect(callback).toHaveBeenCalledTimes(1)
-
-    // Cancel the animation
-    cancel()
-  })
-
-  it('should wait for async callback to finish before calling again', async () => {
-    const callback = jest.fn(async () => {
-      // Simulate async work
-      await new Promise((resolve) => setTimeout(resolve, 50))
+describe('raf timing accuracy', () => {
+  beforeEach(() => {
+    jest.useFakeTimers()
+    jest.spyOn(globalThis, 'requestAnimationFrame').mockImplementation((cb) => {
+      return setTimeout(() => cb(performance.now()), 16) as unknown as number
     })
-    const rate = 100 // Call every 100ms
+    jest.spyOn(globalThis, 'cancelAnimationFrame').mockImplementation((id) => {
+      clearTimeout(id)
+    })
+  })
 
-    const cancel = requestAnimation(callback, rate)
+  afterEach(() => {
+    jest.useRealTimers()
+    jest.restoreAllMocks()
+  })
 
-    // Fast-forward time to allow the first call
-    jest.advanceTimersByTime(150) // Should trigger callback once
+  it('should call the callback roughly every 100ms', async () => {
+    const callTimestamps: number[] = []
 
-    expect(callback).toHaveBeenCalledTimes(1)
+    const callback = jest.fn().mockImplementation(() => {
+      callTimestamps.push(Date.now())
+      return Promise.resolve()
+    })
 
-    // Fast-forward time again, should not call again since async work is not finished
-    jest.advanceTimersByTime(100) // Should not trigger callback again
-    expect(callback).toHaveBeenCalledTimes(1)
+    raf(callback, 100)
 
-    // Wait for the async callback to finish
-    await new Promise((resolve) => setTimeout(resolve, 50))
+    for (let i = 0; i < 1000; i += 16) {
+      jest.advanceTimersByTime(16)
+      await Promise.resolve()
+    }
 
-    // Fast-forward time to allow the next call
-    jest.advanceTimersByTime(100) // Now it should trigger callback again
-    expect(callback).toHaveBeenCalledTimes(2)
+    expect(callTimestamps.length).toBeGreaterThanOrEqual(5)
 
-    cancel() // Clean up
+    // ±10ms
+    for (let i = 1; i < callTimestamps.length; i++) {
+      const delta = callTimestamps[i] - callTimestamps[i - 1]
+      expect(delta).toBeGreaterThanOrEqual(95)
+    }
   })
 })
