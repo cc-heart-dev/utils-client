@@ -4,3 +4,4 @@ coverage/**/*
 publish.sh
 
 dist/
+.vscode
