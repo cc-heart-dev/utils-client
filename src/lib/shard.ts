@@ -13,12 +13,12 @@ export const handleInvoke = (callback: Fn) => {
   }
 }
 
-interface GlobalErrorHanlder {
+interface GlobalErrorHandler {
   errorHandler?: (e: ErrorEvent) => void
   promiseErrorHandler?: (e: PromiseRejectionEventInit) => void
 }
 
-export const globalErrorHanlder = (opts = {} as GlobalErrorHanlder) => {
+export const globalErrorHandler = (opts = {} as GlobalErrorHandler) => {
   if (typeof window === 'undefined') return
 
   window.addEventListener('error', (evt) => {
